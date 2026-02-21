@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="bn" class="dark">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>অন্তহীন ২৬ - কলিজিয়েটের ঐতিহ্য</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,typography"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"/>
+    <script>
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              primary: "#FF0033", // Electric Red
+              "primary-hover": "#CC0029",
+              "background-light": "#F5F5F5",
+              "background-dark": "#1A1A1A",
+              "surface-dark": "#252525",
+              "surface-light": "#FFFFFF",
+              "border-light": "#E5E7EB",
+              "border-dark": "#333333",
+            },
+            fontFamily: {
+              display: ["'Hind Siliguri'", "sans-serif"],
+              sans: ["'Hind Siliguri'", "sans-serif"],
+              header: ["'Hind Siliguri'", "sans-serif"],
+            },
+            animation: {
+              'fade-in': 'fadeIn 0.5s ease-out',
+            },
+            keyframes: {
+              fadeIn: {
+                '0%': { opacity: '0', transform: 'translateY(10px)' },
+                '100%': { opacity: '1', transform: 'translateY(0)' },
+              }
+            }
+          },
+        },
+      };
+    </script>
+    <style>
+      body {
+        scroll-behavior: smooth;
+      }
+      .hero-bg {
+        background-image: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.6)), url('https://images.unsplash.com/photo-1541339907198-e08756dedf3f?q=80&w=1920&auto=format&fit=crop');
+        background-size: cover;
+        background-position: center;
+      }
+      ::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+      }
+      ::-webkit-scrollbar-track {
+        background: #1a1a1a; 
+      }
+      ::-webkit-scrollbar-thumb {
+        background: #333; 
+        border-radius: 4px;
+      }
+      ::-webkit-scrollbar-thumb:hover {
+        background: #FF0033; 
+      }
+    </style>
+<script type="importmap">
+{
+  "imports": {
+    "react": "https://esm.sh/react@18.2.0",
+    "react/": "https://esm.sh/react@18.2.0/",
+    "react-dom": "https://esm.sh/react-dom@18.2.0",
+    "react-dom/client": "https://esm.sh/react-dom@18.2.0/client",
+    "react-router-dom": "https://esm.sh/react-router-dom@6.22.3?deps=react@18.2.0,react-dom@18.2.0",
+    "react-dom/": "https://esm.sh/react-dom@18.2.0/"
+  }
+}
+</script>
+<link rel="stylesheet" href="/index.css">
+</head>
+<body class="bg-background-light dark:bg-background-dark text-gray-900 dark:text-gray-100 font-sans antialiased transition-colors duration-300">
+    <div id="root"></div>
+<script type="module" src="/index.tsx"></script>
+</body>
+</html>

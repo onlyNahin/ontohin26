@@ -1,0 +1,207 @@
+import React, { useState, useEffect } from 'react';
+import { HashRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { Home } from './pages/Home';
+import { Gallery } from './pages/Gallery';
+import { History } from './pages/History';
+import { Announcements } from './pages/Announcements';
+import { Login } from './pages/Login';
+import { PublicFormView } from './pages/PublicFormView';
+import { AdminLayout } from './layouts/AdminLayout';
+import { Dashboard } from './pages/admin/Dashboard';
+import { EventManager } from './pages/admin/EventManager';
+import { EventInbox } from './pages/admin/EventInbox';
+import { SiteIdentity } from './pages/admin/SiteIdentity';
+import { GalleryRedirects } from './pages/admin/GalleryRedirects';
+import { AboutManager } from './pages/admin/AboutManager';
+import { HistoryManager } from './pages/admin/HistoryManager';
+import { FooterManager } from './pages/admin/FooterManager';
+import { Settings } from './pages/admin/Settings';
+import { FormBuilder } from './pages/admin/FormBuilder';
+import { AnnouncementManager } from './pages/admin/AnnouncementManager';
+import { INITIAL_EVENTS, GALLERY_ITEMS, INITIAL_ABOUT_DATA, INITIAL_HISTORY_DATA, INITIAL_FOOTER_DATA, INITIAL_HERO_DATA, INITIAL_ANNOUNCEMENTS } from './constants';
+import { Event, RedirectLink, GalleryItem, AboutSectionData, HistoryPageData, FooterData, HeroData, RegistrationSubmission, EventRegistration, CustomForm, Announcement, FormSubmission } from './types';
+import { Footer } from './components/Footer';
+import { FormInbox } from './pages/admin/FormInbox';
+import { db } from './firebase';
+import { collection, onSnapshot, query, orderBy, doc, updateDoc, deleteDoc, addDoc } from 'firebase/firestore';
+
+function App() {
+  const [darkMode, setDarkMode] = useState(true);
+  const [loading, setLoading] = useState(true);
+
+  // Persist authentication state
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(() => {
+    return localStorage.getItem('ontohin_auth') === 'true';
+  });
+
+  const [events, setEvents] = useState<Event[]>([]);
+  const [announcements, setAnnouncements] = useState<Announcement[]>([]);
+  const [galleryItems, setGalleryItems] = useState<GalleryItem[]>([]);
+  const [aboutData, setAboutData] = useState<AboutSectionData>(INITIAL_ABOUT_DATA);
+  const [historyData, setHistoryData] = useState<HistoryPageData>(INITIAL_HISTORY_DATA);
+  const [footerData, setFooterData] = useState<FooterData>(INITIAL_FOOTER_DATA);
+  const [heroData, setHeroData] = useState<HeroData>(INITIAL_HERO_DATA);
+  const [registrations, setRegistrations] = useState<RegistrationSubmission[]>([]);
+  const [customForms, setCustomForms] = useState<CustomForm[]>([]);
+  const [formSubmissions, setFormSubmissions] = useState<FormSubmission[]>([]);
+
+  // Firestore Data Fetching
+  useEffect(() => {
+    const unsubEvents = onSnapshot(query(collection(db, 'events'), orderBy('date', 'desc')), (snapshot) => {
+      const data = snapshot.docs.map(doc => ({ ...doc.data(), id: doc.id } as Event));
+      setEvents(data.length > 0 ? data : INITIAL_EVENTS);
+    });
+
+    const unsubAnnouncements = onSnapshot(query(collection(db, 'announcements'), orderBy('date', 'desc')), (snapshot) => {
+      const data = snapshot.docs.map(doc => ({ ...doc.data(), id: doc.id } as Announcement));
+      setAnnouncements(data.length > 0 ? data : INITIAL_ANNOUNCEMENTS);
+    });
+
+    const unsubGallery = onSnapshot(query(collection(db, 'gallery'), orderBy('date', 'desc')), (snapshot) => {
+      const data = snapshot.docs.map(doc => ({ ...doc.data(), id: doc.id } as GalleryItem));
+      setGalleryItems(data.length > 0 ? data : GALLERY_ITEMS);
+    });
+
+    const unsubAbout = onSnapshot(doc(db, 'metadata', 'about'), (doc) => {
+      if (doc.exists()) setAboutData(doc.data() as AboutSectionData);
+    });
+
+    const unsubHistory = onSnapshot(doc(db, 'metadata', 'history'), (doc) => {
+      if (doc.exists()) setHistoryData(doc.data() as HistoryPageData);
+    });
+
+    const unsubFooter = onSnapshot(doc(db, 'metadata', 'footer'), (doc) => {
+      if (doc.exists()) setFooterData(doc.data() as FooterData);
+    });
+
+    const unsubHero = onSnapshot(doc(db, 'metadata', 'hero'), (doc) => {
+      if (doc.exists()) setHeroData(doc.data() as HeroData);
+    });
+
+    const unsubRegistrations = onSnapshot(query(collection(db, 'registrations'), orderBy('submittedAt', 'desc')), (snapshot) => {
+      const data = snapshot.docs.map(doc => ({ ...doc.data(), id: doc.id } as RegistrationSubmission));
+      setRegistrations(data);
+    });
+
+    const unsubForms = onSnapshot(query(collection(db, 'forms'), orderBy('createdAt', 'desc')), (snapshot) => {
+      const data = snapshot.docs.map(doc => ({ ...doc.data(), id: doc.id } as CustomForm));
+      setCustomForms(data);
+    });
+
+    const unsubSubmissions = onSnapshot(query(collection(db, 'submissions'), orderBy('submittedAt', 'desc')), (snapshot) => {
+      const data = snapshot.docs.map(doc => ({ ...doc.data(), id: doc.id } as FormSubmission));
+      setFormSubmissions(data);
+    });
+
+    const unsubLinks = onSnapshot(query(collection(db, 'links'), orderBy('label', 'asc')), (snapshot) => {
+      const data = snapshot.docs.map(doc => ({ ...doc.data(), id: doc.id } as RedirectLink));
+      setRedirectLinks(data);
+    });
+
+    setLoading(false);
+
+    return () => {
+      unsubEvents();
+      unsubAnnouncements();
+      unsubGallery();
+      unsubAbout();
+      unsubHistory();
+      unsubFooter();
+      unsubHero();
+      unsubRegistrations();
+      unsubForms();
+      unsubSubmissions();
+      unsubLinks();
+    };
+  }, []);
+
+  // Shared state for Redirect Links (accessible in Admin and Gallery)
+  const [redirectLinks, setRedirectLinks] = useState<RedirectLink[]>([]);
+
+  useEffect(() => {
+    // Initial theme setup
+    if (darkMode) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+  }, [darkMode]);
+
+  const toggleTheme = () => {
+    setDarkMode(!darkMode);
+  };
+
+  const handleLogin = () => {
+    localStorage.setItem('ontohin_auth', 'true');
+    setIsAuthenticated(true);
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem('ontohin_auth');
+    setIsAuthenticated(false);
+  };
+
+  // Handler passed to Home -> EventRegistrationModal
+  const handleRegistrationSubmit = async (formData: EventRegistration, event: Event) => {
+    const newSubmission = {
+      ...formData,
+      eventId: event.id,
+      eventName: event.title,
+      submittedAt: new Date().toISOString()
+    };
+
+    try {
+      await addDoc(collection(db, 'registrations'), newSubmission);
+    } catch (error) {
+      console.error("Error adding registration: ", error);
+      alert("রেজিস্ট্রেশন করতে সমস্যা হয়েছে।");
+    }
+  };
+
+  return (
+    <Router>
+      <Routes>
+        <Route path="/" element={<Home darkMode={darkMode} toggleTheme={toggleTheme} aboutData={aboutData} footerData={footerData} heroData={heroData} events={events} onRegister={handleRegistrationSubmit} />} />
+        <Route path="/gallery" element={<Gallery darkMode={darkMode} toggleTheme={toggleTheme} redirectLinks={redirectLinks} galleryItems={galleryItems} footerData={footerData} />} />
+        <Route path="/history" element={<History darkMode={darkMode} toggleTheme={toggleTheme} historyData={historyData} footerData={footerData} />} />
+        <Route path="/announcements" element={<Announcements darkMode={darkMode} toggleTheme={toggleTheme} announcements={announcements} footerData={footerData} />} />
+
+        {/* Public Form View */}
+        <Route path="/form/:token" element={<PublicFormView forms={customForms} setSubmissions={setFormSubmissions} darkMode={darkMode} />} />
+
+        {/* Auth Route */}
+        <Route path="/login" element={<Login onLogin={handleLogin} />} />
+
+        {/* Admin Routes */}
+        <Route
+          path="/admin/*"
+          element={
+            isAuthenticated ? (
+              <AdminLayout toggleTheme={toggleTheme} darkMode={darkMode} onLogout={handleLogout}>
+                <Routes>
+                  <Route path="dashboard" element={<Dashboard events={events} redirectLinks={redirectLinks} />} />
+                  <Route path="events" element={<EventManager events={events} setEvents={setEvents} />} />
+                  <Route path="announcements" element={<AnnouncementManager announcements={announcements} setAnnouncements={setAnnouncements} />} />
+                  <Route path="inbox" element={<EventInbox registrations={registrations} setRegistrations={setRegistrations} />} />
+                  <Route path="form-inbox" element={<FormInbox forms={customForms} submissions={formSubmissions} setSubmissions={setFormSubmissions} />} />
+                  <Route path="forms" element={<FormBuilder forms={customForms} setForms={setCustomForms} />} />
+                  <Route path="identity" element={<SiteIdentity heroData={heroData} setHeroData={setHeroData} />} />
+                  <Route path="about" element={<AboutManager aboutData={aboutData} setAboutData={setAboutData} />} />
+                  <Route path="history" element={<HistoryManager historyData={historyData} setHistoryData={setHistoryData} />} />
+                  <Route path="gallery" element={<GalleryRedirects links={redirectLinks} setLinks={setRedirectLinks} galleryItems={galleryItems} setGalleryItems={setGalleryItems} />} />
+                  <Route path="footer" element={<FooterManager footerData={footerData} setFooterData={setFooterData} />} />
+                  <Route path="settings" element={<Settings />} />
+                  <Route path="*" element={<Navigate to="dashboard" replace />} />
+                </Routes>
+              </AdminLayout>
+            ) : (
+              <Navigate to="/login" replace />
+            )
+          }
+        />
+      </Routes>
+    </Router>
+  );
+}
+
+export default App;
