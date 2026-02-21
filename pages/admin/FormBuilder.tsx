@@ -325,6 +325,31 @@ const FormEditor: React.FC<FormEditorProps> = ({ form, setForm, onSave, onCancel
                 <div className="lg:col-span-2 space-y-6">
                     {activeTab === 'fields' && (
                         <div className="space-y-4">
+                            {/* Form Header Info */}
+                            <div className="bg-surface-light dark:bg-surface-dark p-6 rounded-lg shadow-sm border border-border-light dark:border-border-dark border-t-4 border-t-primary">
+                                <div className="space-y-4">
+                                    <input
+                                        type="text"
+                                        value={form.title}
+                                        onChange={(e) => handleFormMetaChange('title', e.target.value)}
+                                        className="w-full bg-transparent border-b border-gray-200 dark:border-gray-800 px-0 py-2 text-3xl font-bold text-gray-900 dark:text-white focus:outline-none focus:border-primary transition-colors placeholder-gray-400"
+                                        placeholder="ফর্মের শিরোনাম"
+                                    />
+                                    <textarea
+                                        value={form.description}
+                                        onChange={(e) => handleFormMetaChange('description', e.target.value)}
+                                        className="w-full bg-transparent border-b border-gray-100 dark:border-gray-900 px-0 py-1 text-sm text-gray-500 dark:text-gray-400 focus:outline-none focus:border-primary transition-colors placeholder-gray-400 resize-none"
+                                        placeholder="ফর্মের বিবরণ (ঐচ্ছিক)"
+                                        rows={1}
+                                        onInput={(e) => {
+                                            const target = e.target as HTMLTextAreaElement;
+                                            target.style.height = 'auto';
+                                            target.style.height = target.scrollHeight + 'px';
+                                        }}
+                                    />
+                                </div>
+                            </div>
+
                             {form.fields.map((field, index) => (
                                 <FieldCard
                                     key={field.id}
