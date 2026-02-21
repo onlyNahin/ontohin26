@@ -52,17 +52,17 @@ function App() {
   useEffect(() => {
     const unsubEvents = onSnapshot(query(collection(db, 'events'), orderBy('date', 'desc')), (snapshot) => {
       const data = snapshot.docs.map(doc => ({ ...doc.data(), id: doc.id } as Event));
-      setEvents(data.length > 0 ? data : INITIAL_EVENTS);
+      setEvents(snapshot.empty && !isAuthenticated ? INITIAL_EVENTS : data);
     });
 
     const unsubAnnouncements = onSnapshot(query(collection(db, 'announcements'), orderBy('date', 'desc')), (snapshot) => {
       const data = snapshot.docs.map(doc => ({ ...doc.data(), id: doc.id } as Announcement));
-      setAnnouncements(data.length > 0 ? data : INITIAL_ANNOUNCEMENTS);
+      setAnnouncements(snapshot.empty && !isAuthenticated ? INITIAL_ANNOUNCEMENTS : data);
     });
 
     const unsubGallery = onSnapshot(query(collection(db, 'gallery'), orderBy('date', 'desc')), (snapshot) => {
       const data = snapshot.docs.map(doc => ({ ...doc.data(), id: doc.id } as GalleryItem));
-      setGalleryItems(data.length > 0 ? data : GALLERY_ITEMS);
+      setGalleryItems(snapshot.empty && !isAuthenticated ? GALLERY_ITEMS : data);
     });
 
     const unsubAbout = onSnapshot(doc(db, 'metadata', 'about'), (doc) => {
@@ -121,7 +121,7 @@ function App() {
       unsubLinks();
       unsubAnalytics();
     };
-  }, []);
+  }, [isAuthenticated]);
 
   // Increment views only once per session/mount
   useEffect(() => {

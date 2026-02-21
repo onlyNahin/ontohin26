@@ -213,11 +213,34 @@ interface FormEditorProps {
 const FormEditor: React.FC<FormEditorProps> = ({ form, setForm, onSave, onCancel, onCopyLink }) => {
     const [activeTab, setActiveTab] = useState<'fields' | 'settings' | 'integration'>('fields');
 
-    const copyToClipboard = (text: string, message: string) => {
+    const copyToClipboard = (text: string, successMessage: string) => {
+        const fallbackCopy = () => {
+            const textArea = document.createElement("textarea");
+            textArea.value = text;
+            textArea.style.position = "fixed";
+            textArea.style.left = "-9999px";
+            textArea.style.top = "0";
+            document.body.appendChild(textArea);
+            textArea.focus();
+            textArea.select();
+            try {
+                const successful = document.execCommand('copy');
+                if (successful) alert(successMessage);
+                else prompt("এটি কপি করুন:", text);
+            } catch (err) {
+                prompt("এটি কপি করুন:", text);
+            }
+            document.body.removeChild(textArea);
+        };
+
         if (navigator.clipboard) {
-            navigator.clipboard.writeText(text).then(() => alert(message));
+            navigator.clipboard.writeText(text).then(() => {
+                alert(successMessage);
+            }).catch(() => {
+                fallbackCopy();
+            });
         } else {
-            prompt("এটি কপি করুন:", text);
+            fallbackCopy();
         }
     };
     const handleAddField = (type: FormFieldType) => {
