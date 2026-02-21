@@ -205,24 +205,31 @@ export const Home: React.FC<HomeProps> = ({ darkMode, toggleTheme, aboutData, fo
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 auto-rows-[200px]">
-              {(galleryItems && galleryItems.length > 0 ? (
-                galleryItems.some(i => i.featured)
-                  ? galleryItems.filter(i => i.featured)
-                  : galleryItems.slice(0, 4)
-              ) : GALLERY_ITEMS).slice(0, 4).map((item, index) => (
-                <div key={item.id} className={`group relative overflow-hidden rounded-sm cursor-pointer ${index === 0 || index === 3 ? 'md:col-span-2 md:row-span-2' : ''}`} onClick={() => navigate('/gallery')}>
-                  <img
-                    src={item.imageUrl}
-                    alt={item.title}
-                    className="object-cover w-full h-full transform group-hover:scale-105 transition-transform duration-700 opacity-80 group-hover:opacity-100"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-transparent to-transparent opacity-60 group-hover:opacity-80 transition-opacity"></div>
-                  <div className="absolute bottom-0 left-0 p-6 translate-y-4 group-hover:translate-y-0 transition-transform duration-300">
-                    <span className="text-primary text-xs font-bold uppercase tracking-wider mb-1 block">{item.category}</span>
-                    <h3 className={`font-display font-bold text-white ${index === 0 || index === 3 ? 'text-2xl' : 'text-lg'}`}>{item.title}</h3>
+              {(() => {
+                const realItems = galleryItems || [];
+                const displayItems = realItems.length > 0
+                  ? [...realItems].sort((a, b) => {
+                    if (a.featured && !b.featured) return -1;
+                    if (!a.featured && b.featured) return 1;
+                    return new Date(b.date).getTime() - new Date(a.date).getTime();
+                  }).slice(0, 4)
+                  : GALLERY_ITEMS.slice(0, 4);
+
+                return displayItems.map((item, index) => (
+                  <div key={item.id} className={`group relative overflow-hidden rounded-sm cursor-pointer ${index === 0 || index === 3 ? 'md:col-span-2 md:row-span-2' : ''}`} onClick={() => navigate('/gallery')}>
+                    <img
+                      src={item.imageUrl}
+                      alt={item.title}
+                      className="object-cover w-full h-full transform group-hover:scale-105 transition-transform duration-700 opacity-80 group-hover:opacity-100"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-transparent to-transparent opacity-60 group-hover:opacity-80 transition-opacity"></div>
+                    <div className="absolute bottom-0 left-0 p-6 translate-y-4 group-hover:translate-y-0 transition-transform duration-300">
+                      <span className="text-primary text-xs font-bold uppercase tracking-wider mb-1 block">{item.category}</span>
+                      <h3 className={`font-display font-bold text-white ${index === 0 || index === 3 ? 'text-2xl' : 'text-lg'}`}>{item.title}</h3>
+                    </div>
                   </div>
-                </div>
-              ))}
+                ));
+              })()}
             </div>
             <div className="mt-12 text-center">
               <button onClick={() => navigate('/gallery')} className="bg-transparent border-2 border-gray-900 dark:border-white text-gray-900 dark:text-white font-bold py-3 px-8 uppercase tracking-widest hover:bg-gray-900 hover:text-white dark:hover:bg-white dark:hover:text-black transition-colors">

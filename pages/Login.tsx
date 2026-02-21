@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { auth } from '../firebase';
+import { signInWithEmailAndPassword } from 'firebase/auth';
 
 interface LoginProps {
   onLogin: () => void;
@@ -8,16 +10,23 @@ interface LoginProps {
 export const Login: React.FC<LoginProps> = ({ onLogin }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Mock authentication
-    if (email === 'admin@ontohin26.com' && password === 'admin') {
-      onLogin();
-      navigate('/admin/events');
-    } else {
-      alert('Invalid credentials. Use admin@ontohin26.com / admin');
+    setError('');
+    setLoading(true);
+    try {
+      await signInWithEmailAndPassword(auth, email, password);
+      onLogin(); // Keep for legacy trigger if needed, though state is in App
+      navigate('/admin/dashboard');
+    } catch (err: any) {
+      console.error(err);
+      setError('ইমেইল বা পাসওয়ার্ড ভুল। অনুগ্রহ করে পুনরায় চেষ্টা করুন।');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -35,6 +44,11 @@ export const Login: React.FC<LoginProps> = ({ onLogin }) => {
       <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
         <div className="bg-surface-dark py-8 px-4 shadow sm:rounded-lg sm:px-10 border border-gray-800">
           <form className="space-y-6" onSubmit={handleSubmit}>
+            {error && (
+              <div className="bg-red-500/10 border border-red-500/50 text-red-500 p-3 rounded text-sm text-center animate-shake">
+                {error}
+              </div>
+            )}
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-gray-300">
                 ইমেইল ঠিকানা
@@ -74,14 +88,11 @@ export const Login: React.FC<LoginProps> = ({ onLogin }) => {
             <div>
               <button
                 type="submit"
-                className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary hover:bg-primary-hover focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-all"
+                disabled={loading}
+                className={`w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary hover:bg-primary-hover focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-all ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
               >
-                লগইন
+                {loading ? 'লগইন হচ্ছে...' : 'লগইন'}
               </button>
-            </div>
-            
-            <div className="text-center text-xs text-gray-500">
-                Default: admin@ontohin26.com / admin
             </div>
           </form>
         </div>

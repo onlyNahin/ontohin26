@@ -22,17 +22,16 @@ import { INITIAL_EVENTS, GALLERY_ITEMS, INITIAL_ABOUT_DATA, INITIAL_HISTORY_DATA
 import { Event, RedirectLink, GalleryItem, AboutSectionData, HistoryPageData, FooterData, HeroData, RegistrationSubmission, EventRegistration, CustomForm, Announcement, FormSubmission, AnalyticsData } from './types';
 import { Footer } from './components/Footer';
 import { FormInbox } from './pages/admin/FormInbox';
-import { db } from './firebase';
+import { db, auth } from './firebase';
 import { collection, onSnapshot, query, orderBy, doc, addDoc, updateDoc, deleteDoc, setDoc, increment } from 'firebase/firestore';
+import { onAuthStateChanged } from 'firebase/auth';
 
 function App() {
   const [darkMode, setDarkMode] = useState(true);
   const [loading, setLoading] = useState(true);
 
-  // Persist authentication state
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(() => {
-    return localStorage.getItem('ontohin_auth') === 'true';
-  });
+  // Authentication state
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
 
   const [events, setEvents] = useState<Event[]>([]);
   const [announcements, setAnnouncements] = useState<Announcement[]>([]);
@@ -136,6 +135,14 @@ function App() {
     incrementViews();
   }, []);
 
+  // Listen for Auth changes
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      setIsAuthenticated(!!user);
+    });
+    return () => unsubscribe();
+  }, []);
+
   useEffect(() => {
     // Initial theme setup
     if (darkMode) {
@@ -163,13 +170,11 @@ function App() {
   };
 
   const handleLogin = () => {
-    localStorage.setItem('ontohin_auth', 'true');
-    setIsAuthenticated(true);
+    // State is now managed by onAuthStateChanged
   };
 
   const handleLogout = () => {
-    localStorage.removeItem('ontohin_auth');
-    setIsAuthenticated(false);
+    // State is now managed by onAuthStateChanged
   };
 
   // Handler passed to Home -> EventRegistrationModal

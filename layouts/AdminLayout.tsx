@@ -1,5 +1,7 @@
 import React from 'react';
 import { NavLink, useNavigate, Link } from 'react-router-dom';
+import { auth } from '../firebase';
+import { signOut } from 'firebase/auth';
 
 interface AdminLayoutProps {
   children: React.ReactNode;
@@ -11,9 +13,14 @@ interface AdminLayoutProps {
 export const AdminLayout: React.FC<AdminLayoutProps> = ({ children, toggleTheme, darkMode, onLogout }) => {
   const navigate = useNavigate();
 
-  const handleLogout = () => {
-    onLogout();
-    navigate('/login');
+  const handleLogout = async () => {
+    try {
+      await signOut(auth);
+      onLogout();
+      navigate('/login');
+    } catch (error) {
+      console.error("Error signing out: ", error);
+    }
   };
 
   return (
@@ -36,20 +43,20 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ children, toggleTheme,
           <NavItem to="/admin/about" icon="info" label="আমাদের সম্পর্কে" />
           <NavItem to="/admin/history" icon="history_edu" label="ইতিহাস" />
           <NavItem to="/admin/footer" icon="table_rows" label="ফুটার" />
-          
+
           <div className="pt-6 mt-6 border-t border-border-light dark:border-border-dark">
             <h3 className="px-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">সিস্টেম</h3>
             <NavItem to="/admin/settings" icon="settings" label="সেটিংস" />
-            
-            <Link 
-              to="/" 
+
+            <Link
+              to="/"
               className="w-full group flex items-center px-3 py-2.5 text-sm font-medium rounded-md text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-all"
             >
               <span className="material-icons text-xl mr-3 text-gray-400 group-hover:text-primary dark:text-gray-500">public</span>
               সাইটে ফিরে যান
             </Link>
 
-            <button 
+            <button
               onClick={handleLogout}
               className="w-full group flex items-center px-3 py-2.5 text-sm font-medium rounded-md text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-all"
             >
@@ -61,11 +68,11 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ children, toggleTheme,
         <div className="border-t border-border-light dark:border-border-dark p-4">
           <div className="flex items-center">
             <div className="h-9 w-9 rounded-full bg-gradient-to-tr from-primary to-gray-700 flex items-center justify-center text-white font-bold text-sm">
-              AD
+              {auth.currentUser?.email?.[0].toUpperCase() || 'AD'}
             </div>
-            <div className="ml-3">
-              <p className="text-sm font-medium text-gray-900 dark:text-white">অ্যাডমিন ইউজার</p>
-              <p className="text-xs text-gray-500 dark:text-gray-400">admin@ontohin26.com</p>
+            <div className="ml-3 overflow-hidden">
+              <p className="text-sm font-medium text-gray-900 dark:text-white truncate">অ্যাডমিন</p>
+              <p className="text-xs text-gray-500 dark:text-gray-400 truncate">{auth.currentUser?.email || 'admin@ontohin26.com'}</p>
             </div>
           </div>
         </div>
@@ -82,10 +89,10 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ children, toggleTheme,
 
         <header className="hidden md:flex h-16 bg-background-light dark:bg-background-dark items-center justify-between px-8 border-b border-transparent">
           <div>
-             {/* Header content varies by page */}
+            {/* Header content varies by page */}
           </div>
           <div className="flex items-center space-x-4">
-            <button 
+            <button
               onClick={toggleTheme}
               className="p-2 rounded-full text-gray-500 hover:bg-gray-200 dark:text-gray-400 dark:hover:bg-gray-800 transition"
             >
@@ -111,16 +118,16 @@ const NavItem = ({ to, icon, label }: { to: string; icon: string; label: string 
     to={to}
     className={({ isActive }) => `
       group flex items-center px-3 py-2.5 text-sm font-medium rounded-md transition-all
-      ${isActive 
-        ? 'bg-primary/10 text-primary dark:bg-primary/20 dark:text-white border-l-4 border-primary' 
+      ${isActive
+        ? 'bg-primary/10 text-primary dark:bg-primary/20 dark:text-white border-l-4 border-primary'
         : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-primary dark:hover:text-primary'}
     `}
   >
     {({ isActive }) => (
-        <>
-            <span className={`material-icons text-xl mr-3 ${isActive ? 'text-primary dark:text-white' : 'text-gray-400 group-hover:text-primary dark:text-gray-500'}`}>{icon}</span>
-            {label}
-        </>
+      <>
+        <span className={`material-icons text-xl mr-3 ${isActive ? 'text-primary dark:text-white' : 'text-gray-400 group-hover:text-primary dark:text-gray-500'}`}>{icon}</span>
+        {label}
+      </>
     )}
   </NavLink>
 );
