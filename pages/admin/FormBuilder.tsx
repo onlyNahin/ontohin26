@@ -6,6 +6,7 @@ import { collection, addDoc, updateDoc, deleteDoc, doc } from 'firebase/firestor
 
 interface FormBuilderProps {
     forms: CustomForm[];
+    setForms?: React.Dispatch<React.SetStateAction<CustomForm[]>>;
 }
 
 const FIELD_TYPES: { type: FormFieldType; label: string; icon: string }[] = [
@@ -76,21 +77,23 @@ export const FormBuilder: React.FC<FormBuilderProps> = ({ forms, setForms }) => 
     const handleSaveForm = async () => {
         if (currentForm) {
             try {
+                // Sanitize data: Remove undefined properties as Firestore rejects them
+                const sanitizedData = JSON.parse(JSON.stringify(currentForm));
+                const { id, ...data } = sanitizedData;
+
                 if (currentForm.id && !currentForm.id.startsWith('temp_')) {
                     // Update existing form
-                    const { id, ...data } = currentForm;
                     await updateDoc(doc(db, 'forms', id), data);
                 } else {
-                    // Create new form - remove temporary ID to let Firestore generate its own
-                    const { id, ...data } = currentForm;
+                    // Create new form - let Firestore generate its own ID
                     await addDoc(collection(db, 'forms'), data);
                 }
                 alert('ফর্মটি সফলভাবে সেভ করা হয়েছে!');
                 setView('list');
                 setCurrentForm(null);
-            } catch (error) {
+            } catch (error: any) {
                 console.error("Error saving form: ", error);
-                alert('ফর্ম সেভ করতে সমস্যা হয়েছে। অনুগ্রহ করে পুনরায় চেষ্টা করুন।');
+                alert(`ফর্ম সেভ করতে সমস্যা হয়েছে: ${error.message || 'Unknown error'}`);
             }
         }
     };
@@ -113,7 +116,7 @@ export const FormBuilder: React.FC<FormBuilderProps> = ({ forms, setForms }) => 
             }
         }
 
-        const url = `${window.location.origin}${window.location.pathname}# / form / ${token} `;
+        const url = `${window.location.origin}${window.location.pathname}#/form/${token}`;
 
         // Copy logic with fallback
         if (navigator.clipboard && window.isSecureContext) {
@@ -161,7 +164,7 @@ export const FormBuilder: React.FC<FormBuilderProps> = ({ forms, setForms }) => 
                         <div>
                             <div className="flex justify-between items-start mb-2">
                                 <h3 className="text-lg font-bold text-gray-900 dark:text-white truncate" title={form.title}>{form.title}</h3>
-                                <span className={`px - 2 py - 0.5 text - xs rounded - full ${form.status === 'published' ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300' : 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300'} `}>
+                                <span className={`px-2 py-0.5 text-xs rounded-full ${form.status === 'published' ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300' : 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300'}`}>
                                     {form.status === 'published' ? 'Published' : 'Draft'}
                                 </span>
                             </div>
@@ -254,7 +257,7 @@ const FormEditor: React.FC<FormEditorProps> = ({ form, setForm, onSave, onCancel
             type,
             label: `নতুন ${type.replace('_', ' ')} `,
             required: false,
-            options: type === 'multiple_choice' || type === 'payment_method' ? ['Option 1', 'Option 2'] : undefined
+            ...(type === 'multiple_choice' || type === 'payment_method' ? { options: ['Option 1', 'Option 2'] } : {})
         };
         setForm(prev => prev ? { ...prev, fields: [...prev.fields, newField] } : null);
     };
