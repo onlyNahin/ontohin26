@@ -142,6 +142,10 @@ export interface CustomForm {
     shareToken?: string;
 }
 
+export interface AnalyticsData {
+    views: number;
+}
+
 export interface FormSubmission {
     id: string;
     formId: string;

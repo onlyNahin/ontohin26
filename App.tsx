@@ -19,11 +19,11 @@ import { Settings } from './pages/admin/Settings';
 import { FormBuilder } from './pages/admin/FormBuilder';
 import { AnnouncementManager } from './pages/admin/AnnouncementManager';
 import { INITIAL_EVENTS, GALLERY_ITEMS, INITIAL_ABOUT_DATA, INITIAL_HISTORY_DATA, INITIAL_FOOTER_DATA, INITIAL_HERO_DATA, INITIAL_ANNOUNCEMENTS } from './constants';
-import { Event, RedirectLink, GalleryItem, AboutSectionData, HistoryPageData, FooterData, HeroData, RegistrationSubmission, EventRegistration, CustomForm, Announcement, FormSubmission } from './types';
+import { Event, RedirectLink, GalleryItem, AboutSectionData, HistoryPageData, FooterData, HeroData, RegistrationSubmission, EventRegistration, CustomForm, Announcement, FormSubmission, AnalyticsData } from './types';
 import { Footer } from './components/Footer';
 import { FormInbox } from './pages/admin/FormInbox';
 import { db } from './firebase';
-import { collection, onSnapshot, query, orderBy, doc, updateDoc, deleteDoc, addDoc } from 'firebase/firestore';
+import { collection, onSnapshot, query, orderBy, doc, addDoc, updateDoc, deleteDoc, setDoc, increment } from 'firebase/firestore';
 
 function App() {
   const [darkMode, setDarkMode] = useState(true);
@@ -44,6 +44,9 @@ function App() {
   const [registrations, setRegistrations] = useState<RegistrationSubmission[]>([]);
   const [customForms, setCustomForms] = useState<CustomForm[]>([]);
   const [formSubmissions, setFormSubmissions] = useState<FormSubmission[]>([]);
+  // Shared state for Redirect Links (accessible in Admin and Gallery)
+  const [redirectLinks, setRedirectLinks] = useState<RedirectLink[]>([]);
+  const [analytics, setAnalytics] = useState<AnalyticsData>({ views: 0 });
 
   // Firestore Data Fetching
   useEffect(() => {
@@ -98,6 +101,10 @@ function App() {
       setRedirectLinks(data);
     });
 
+    const unsubAnalytics = onSnapshot(doc(db, 'metadata', 'analytics'), (doc) => {
+      if (doc.exists()) setAnalytics(doc.data() as AnalyticsData);
+    });
+
     setLoading(false);
 
     return () => {
@@ -112,11 +119,22 @@ function App() {
       unsubForms();
       unsubSubmissions();
       unsubLinks();
+      unsubAnalytics();
     };
   }, []);
 
-  // Shared state for Redirect Links (accessible in Admin and Gallery)
-  const [redirectLinks, setRedirectLinks] = useState<RedirectLink[]>([]);
+  // Increment views only once per session/mount
+  useEffect(() => {
+    const incrementViews = async () => {
+      try {
+        const analyticsRef = doc(db, 'metadata', 'analytics');
+        await setDoc(analyticsRef, { views: increment(1) }, { merge: true });
+      } catch (error) {
+        console.error("Error incrementing views:", error);
+      }
+    };
+    incrementViews();
+  }, []);
 
   useEffect(() => {
     // Initial theme setup
@@ -192,17 +210,17 @@ function App() {
             isAuthenticated ? (
               <AdminLayout toggleTheme={toggleTheme} darkMode={darkMode} onLogout={handleLogout}>
                 <Routes>
-                  <Route path="dashboard" element={<Dashboard events={events} redirectLinks={redirectLinks} />} />
-                  <Route path="events" element={<EventManager events={events} setEvents={setEvents} />} />
-                  <Route path="announcements" element={<AnnouncementManager announcements={announcements} setAnnouncements={setAnnouncements} />} />
-                  <Route path="inbox" element={<EventInbox registrations={registrations} setRegistrations={setRegistrations} />} />
-                  <Route path="form-inbox" element={<FormInbox forms={customForms} submissions={formSubmissions} setSubmissions={setFormSubmissions} />} />
-                  <Route path="forms" element={<FormBuilder forms={customForms} setForms={setCustomForms} />} />
-                  <Route path="identity" element={<SiteIdentity heroData={heroData} setHeroData={setHeroData} />} />
-                  <Route path="about" element={<AboutManager aboutData={aboutData} setAboutData={setAboutData} />} />
-                  <Route path="history" element={<HistoryManager historyData={historyData} setHistoryData={setHistoryData} />} />
-                  <Route path="gallery" element={<GalleryRedirects links={redirectLinks} setLinks={setRedirectLinks} galleryItems={galleryItems} setGalleryItems={setGalleryItems} />} />
-                  <Route path="footer" element={<FooterManager footerData={footerData} setFooterData={setFooterData} />} />
+                  <Route path="dashboard" element={<Dashboard events={events} redirectLinks={redirectLinks} analytics={analytics} />} />
+                  <Route path="events" element={<EventManager events={events} />} />
+                  <Route path="announcements" element={<AnnouncementManager announcements={announcements} />} />
+                  <Route path="inbox" element={<EventInbox registrations={registrations} />} />
+                  <Route path="form-inbox" element={<FormInbox forms={customForms} submissions={formSubmissions} />} />
+                  <Route path="forms" element={<FormBuilder forms={customForms} />} />
+                  <Route path="identity" element={<SiteIdentity heroData={heroData} />} />
+                  <Route path="about" element={<AboutManager aboutData={aboutData} />} />
+                  <Route path="history" element={<HistoryManager historyData={historyData} />} />
+                  <Route path="gallery" element={<GalleryRedirects galleryItems={galleryItems} redirectLinks={redirectLinks} />} />
+                  <Route path="footer" element={<FooterManager footerData={footerData} />} />
                   <Route path="settings" element={<Settings />} />
                   <Route path="*" element={<Navigate to="dashboard" replace />} />
                 </Routes>

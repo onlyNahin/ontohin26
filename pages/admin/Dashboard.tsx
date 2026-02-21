@@ -1,18 +1,27 @@
 import React from 'react';
-import { Event, RedirectLink } from '../../types';
+import { Event, RedirectLink, AnalyticsData } from '../../types';
 import { Link } from 'react-router-dom';
 
 interface DashboardProps {
     events: Event[];
     redirectLinks: RedirectLink[];
+    analytics: AnalyticsData;
 }
 
-export const Dashboard: React.FC<DashboardProps> = ({ events, redirectLinks }) => {
+export const Dashboard: React.FC<DashboardProps> = ({ events, redirectLinks, analytics }) => {
     // Logic to calculate stats
     const totalEvents = events.length;
     const publishedEvents = events.filter(e => e.status === 'Published').length;
     const linksCount = redirectLinks.length;
-    
+
+    // Helper to format numbers to Bengali shorthand
+    const formatBN = (num: number) => {
+        if (num >= 1000) {
+            return (num / 1000).toFixed(1).replace('.', '.') + 'হাজার';
+        }
+        return num.toLocaleString('bn-BD');
+    };
+
     // Mock upcoming events for display (simple sort by date string)
     const upcomingEvents = [...events]
         .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
@@ -27,9 +36,9 @@ export const Dashboard: React.FC<DashboardProps> = ({ events, redirectLinks }) =
                     <p className="text-sm text-gray-500 dark:text-gray-400">স্বাগতম, অ্যাডমিন। আজ যা ঘটছে।</p>
                 </div>
                 <div className="text-left sm:text-right">
-                     <p className="text-sm font-medium text-gray-900 dark:text-white bg-surface-light dark:bg-surface-dark px-3 py-1 rounded-md inline-block border border-border-light dark:border-border-dark">
+                    <p className="text-sm font-medium text-gray-900 dark:text-white bg-surface-light dark:bg-surface-dark px-3 py-1 rounded-md inline-block border border-border-light dark:border-border-dark">
                         {new Date().toLocaleDateString('bn-BD', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
-                     </p>
+                    </p>
                 </div>
             </div>
 
@@ -38,7 +47,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ events, redirectLinks }) =
                 <DashboardStat title="মোট ইভেন্ট" value={totalEvents} icon="event" color="text-blue-500" bg="bg-blue-500/10" trend="+২ এই সপ্তাহে" />
                 <DashboardStat title="প্রকাশিত" value={publishedEvents} icon="check_circle" color="text-green-500" bg="bg-green-500/10" trend="সক্রিয়" />
                 <DashboardStat title="গ্যালারি লিংক" value={linksCount} icon="link" color="text-purple-500" bg="bg-purple-500/10" trend="রিডাইরেক্ট" />
-                <DashboardStat title="মোট ভিউ" value="১২.৪হাজার" icon="visibility" color="text-primary" bg="bg-primary/10" trend="+১২% গত মাসের তুলনায়" />
+                <DashboardStat title="মোট ভিউ" value={formatBN(analytics.views)} icon="visibility" color="text-primary" bg="bg-primary/10" trend="+১২% গত মাসের তুলনায়" />
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -98,7 +107,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ events, redirectLinks }) =
                                 <span className="material-icons text-2xl text-gray-400 group-hover:text-primary mb-2 transition-colors">palette</span>
                                 <span className="text-xs font-medium text-gray-700 dark:text-gray-300 group-hover:text-primary transition-colors">কাস্টমাইজ</span>
                             </Link>
-                             <Link to="/admin/settings" className="flex flex-col items-center justify-center p-4 rounded-lg bg-gray-50 dark:bg-black/20 hover:bg-primary/10 hover:text-primary transition-colors group text-center border border-transparent hover:border-primary/20">
+                            <Link to="/admin/settings" className="flex flex-col items-center justify-center p-4 rounded-lg bg-gray-50 dark:bg-black/20 hover:bg-primary/10 hover:text-primary transition-colors group text-center border border-transparent hover:border-primary/20">
                                 <span className="material-icons text-2xl text-gray-400 group-hover:text-primary mb-2 transition-colors">settings</span>
                                 <span className="text-xs font-medium text-gray-700 dark:text-gray-300 group-hover:text-primary transition-colors">সেটিংস</span>
                             </Link>
@@ -106,7 +115,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ events, redirectLinks }) =
                     </div>
 
                     <div className="bg-gradient-to-br from-primary to-red-900 rounded-lg shadow-lg p-6 text-white relative overflow-hidden">
-                         <div className="absolute top-0 right-0 p-4 opacity-10">
+                        <div className="absolute top-0 right-0 p-4 opacity-10">
                             <span className="material-icons text-6xl">dns</span>
                         </div>
                         <h3 className="text-lg font-bold mb-4 relative z-10">সিস্টেম স্ট্যাটাস</h3>
@@ -125,7 +134,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ events, redirectLinks }) =
                                     <span className="opacity-90">স্টোরেজ</span>
                                     <span className="font-mono font-bold">৪৫%</span>
                                 </div>
-                                 <div className="w-full bg-black/30 rounded-full h-1.5">
+                                <div className="w-full bg-black/30 rounded-full h-1.5">
                                     <div className="bg-white h-1.5 rounded-full" style={{ width: '45%' }}></div>
                                 </div>
                             </div>
