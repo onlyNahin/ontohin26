@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { CustomForm, FormField, FormFieldType } from '../../types';
 import { db } from '../../firebase';
+import { INITIAL_ANNOUNCEMENTS, GOOGLE_APPS_SCRIPT_TEMPLATE } from '../../constants';
 import { collection, addDoc, updateDoc, deleteDoc, doc } from 'firebase/firestore';
 
 interface FormBuilderProps {
@@ -211,6 +212,14 @@ interface FormEditorProps {
 
 const FormEditor: React.FC<FormEditorProps> = ({ form, setForm, onSave, onCancel, onCopyLink }) => {
     const [activeTab, setActiveTab] = useState<'fields' | 'settings' | 'integration'>('fields');
+
+    const copyToClipboard = (text: string, message: string) => {
+        if (navigator.clipboard) {
+            navigator.clipboard.writeText(text).then(() => alert(message));
+        } else {
+            prompt("এটি কপি করুন:", text);
+        }
+    };
     const handleAddField = (type: FormFieldType) => {
         const newField: FormField = {
             id: Date.now().toString(),
@@ -369,12 +378,29 @@ const FormEditor: React.FC<FormEditorProps> = ({ form, setForm, onSave, onCancel
                                             এটি কীভাবে সেটআপ করবেন?
                                         </h4>
                                         <ol className="text-xs text-blue-700 dark:text-blue-400 space-y-2 list-decimal ml-4">
-                                            <li><span className="font-bold">Google Apps Script</span> ওপেন করুন এবং আমি যে কোডটি দিয়েছি তা পেস্ট করুন।</li>
+                                            <li><span className="font-bold">Google Apps Script</span> ওপেন করুন এবং নিচের কোডটি কপি করে পেস্ট করুন।</li>
                                             <li><span className="font-bold">Deploy {'>'} New Deployment</span> এ ব্লিক করুন।</li>
                                             <li>Select Type এ <span className="font-bold">Web App</span> সিলেক্ট করুন।</li>
                                             <li>Who has access এ <span className="font-bold">Anyone</span> সিলেক্ট করে Deploy করুন।</li>
                                             <li>প্রাপ্ত Web App URL টি উপরের বক্সে পেস্ট করুন।</li>
                                         </ol>
+                                    </div>
+
+                                    {/* Script Copy Panel */}
+                                    <div className="space-y-2">
+                                        <div className="flex items-center justify-between">
+                                            <label className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Bridge Script Code</label>
+                                            <button
+                                                onClick={() => copyToClipboard(GOOGLE_APPS_SCRIPT_TEMPLATE, "গুগল স্ক্রিপ্ট কোডটি কপি করা হয়েছে!")}
+                                                className="text-xs bg-primary/10 text-primary px-2 py-1 rounded hover:bg-primary/20 transition-colors flex items-center"
+                                            >
+                                                <span className="material-icons text-xs mr-1">content_copy</span>
+                                                Copy Code
+                                            </button>
+                                        </div>
+                                        <div className="bg-gray-900 rounded-lg p-4 font-mono text-[10px] text-gray-300 overflow-x-auto max-h-60 custom-scrollbar border border-gray-800">
+                                            <pre>{GOOGLE_APPS_SCRIPT_TEMPLATE}</pre>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
