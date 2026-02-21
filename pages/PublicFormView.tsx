@@ -39,6 +39,18 @@ export const PublicFormView: React.FC<PublicFormViewProps> = ({ forms, darkMode 
         setFormData(prev => ({ ...prev, [fieldId]: value }));
     };
 
+    const fileToBase64 = (file: File): Promise<string> => {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = () => {
+                const base64String = (reader.result as string).split(',')[1];
+                resolve(base64String);
+            };
+            reader.onerror = error => reject(error);
+        });
+    };
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         // Validation check for required fields
@@ -57,7 +69,49 @@ export const PublicFormView: React.FC<PublicFormViewProps> = ({ forms, darkMode 
             };
 
             try {
+                // 1. Save to Firebase First
                 await addDoc(collection(db, 'submissions'), newSubmission);
+
+                // 2. Google Integration (Async)
+                if (form.googleIntegration?.enabled && form.googleIntegration.scriptUrl) {
+                    const attachments: Record<string, any> = {};
+                    const formDataWithLabels: Record<string, any> = {};
+
+                    // Prepare data with labels for the sheet
+                    for (const field of form.fields) {
+                        if (field.type === 'description') continue;
+
+                        const value = formData[field.id];
+                        formDataWithLabels[field.label] = value;
+
+                        if (field.type === 'file_upload' && value instanceof File) {
+                            try {
+                                const base64 = await fileToBase64(value);
+                                attachments[field.label] = {
+                                    name: value.name,
+                                    type: value.type,
+                                    base64: base64
+                                };
+                            } catch (err) {
+                                console.error("File conversion error:", err);
+                            }
+                        }
+                    }
+
+                    // Post to GAS (fire and forget for better UX, or wait if you want to ensure sync)
+                    fetch(form.googleIntegration.scriptUrl, {
+                        method: 'POST',
+                        mode: 'no-cors', // GAS needs no-cors for simple redirects
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            formTitle: form.title,
+                            submittedAt: newSubmission.submittedAt,
+                            formData: formDataWithLabels,
+                            attachments: attachments
+                        })
+                    }).catch(err => console.error("Google Sync Error:", err));
+                }
+
                 setSubmitted(true);
                 setError('');
             } catch (error) {
@@ -222,12 +276,12 @@ export const PublicFormView: React.FC<PublicFormViewProps> = ({ forms, darkMode 
                                                         <input
                                                             type="file"
                                                             className="sr-only"
-                                                            onChange={(e) => handleInputChange(field.id, e.target.files?.[0]?.name || 'File Selected')}
+                                                            onChange={(e) => handleInputChange(field.id, e.target.files?.[0])}
                                                         />
                                                     </label>
                                                 </div>
                                                 <p className="text-xs text-gray-500 dark:text-gray-500">
-                                                    {formData[field.id] ? `Selected: ${formData[field.id]}` : 'PNG, JPG, PDF up to 10MB'}
+                                                    {formData[field.id] instanceof File ? `Selected: ${formData[field.id].name}` : 'PNG, JPG, PDF up to 10MB'}
                                                 </p>
                                             </div>
                                         </div>

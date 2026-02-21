@@ -210,6 +210,7 @@ interface FormEditorProps {
 }
 
 const FormEditor: React.FC<FormEditorProps> = ({ form, setForm, onSave, onCancel, onCopyLink }) => {
+    const [activeTab, setActiveTab] = useState<'fields' | 'settings' | 'integration'>('fields');
     const handleAddField = (type: FormFieldType) => {
         const newField: FormField = {
             id: Date.now().toString(),
@@ -258,88 +259,155 @@ const FormEditor: React.FC<FormEditorProps> = ({ form, setForm, onSave, onCancel
                 </div>
             </div>
 
+            <div className="flex border-b border-gray-200 dark:border-gray-800">
+                <button
+                    onClick={() => setActiveTab('fields')}
+                    className={`px-6 py-3 text-sm font-medium transition-colors border-b-2 ${activeTab === 'fields' ? 'border-primary text-primary' : 'border-transparent text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'}`}
+                >
+                    ফিল্ডস
+                </button>
+                <button
+                    onClick={() => setActiveTab('settings')}
+                    className={`px-6 py-3 text-sm font-medium transition-colors border-b-2 ${activeTab === 'settings' ? 'border-primary text-primary' : 'border-transparent text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'}`}
+                >
+                    সেটিংস
+                </button>
+                <button
+                    onClick={() => setActiveTab('integration')}
+                    className={`px-6 py-3 text-sm font-medium transition-colors border-b-2 ${activeTab === 'integration' ? 'border-primary text-primary' : 'border-transparent text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'}`}
+                >
+                    ইন্টিগ্রেশন
+                </button>
+            </div>
+
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 {/* Main Editor Area */}
                 <div className="lg:col-span-2 space-y-6">
-                    {/* Form Metadata */}
-                    <div className="bg-surface-light dark:bg-surface-dark p-6 rounded-lg shadow-sm border border-border-light dark:border-border-dark space-y-4">
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">ফর্মের নাম</label>
-                            <input
-                                type="text"
-                                value={form.title}
-                                onChange={(e) => handleFormMetaChange('title', e.target.value)}
-                                className="w-full bg-white dark:bg-background-dark border border-gray-300 dark:border-gray-600 rounded-md px-4 py-2 text-gray-900 dark:text-white focus:ring-primary focus:border-primary shadow-sm text-lg font-bold"
-                            />
-                        </div>
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">বিবরণ</label>
-                            <textarea
-                                value={form.description}
-                                onChange={(e) => handleFormMetaChange('description', e.target.value)}
-                                rows={3}
-                                className="w-full bg-white dark:bg-background-dark border border-gray-300 dark:border-gray-600 rounded-md px-4 py-2 text-gray-900 dark:text-white focus:ring-primary focus:border-primary shadow-sm"
-                                placeholder="এই ফর্মটি কিসের জন্য?"
-                            />
-                        </div>
-
-                        {/* Share Link Display */}
-                        <div className="pt-2">
-                            <label className="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1">শেয়ার লিংক</label>
-                            <div className="flex gap-2">
-                                <input
-                                    readOnly
-                                    type="text"
-                                    value={`${window.location.origin}${window.location.pathname}# / form / ${form.shareToken} `}
-                                    className="w-full bg-gray-100 dark:bg-black/40 border border-gray-300 dark:border-gray-700 rounded-md px-3 py-2 text-sm text-gray-600 dark:text-gray-400 font-mono"
+                    {activeTab === 'fields' && (
+                        <div className="space-y-4">
+                            {form.fields.map((field, index) => (
+                                <FieldCard
+                                    key={field.id}
+                                    field={field}
+                                    index={index}
+                                    onUpdate={handleUpdateField}
+                                    onDelete={handleDeleteField}
                                 />
-                                <button
-                                    onClick={onCopyLink}
-                                    className="bg-cyan-100 dark:bg-cyan-900/30 text-cyan-700 dark:text-cyan-300 px-3 py-2 rounded-md hover:bg-cyan-200 dark:hover:bg-cyan-900/50 transition-colors"
-                                    title="Copy Link"
-                                >
-                                    <span className="material-icons text-sm">content_copy</span>
-                                </button>
+                            ))}
+                            {form.fields.length === 0 && (
+                                <div className="text-center py-10 border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-lg">
+                                    <p className="text-gray-500">কোনো ফিল্ড যোগ করা হয়নি। ডান পাশের টুলবক্স থেকে ফিল্ড যোগ করুন।</p>
+                                </div>
+                            )}
+                        </div>
+                    )}
+
+                    {activeTab === 'settings' && (
+                        <div className="bg-surface-light dark:bg-surface-dark p-6 rounded-lg shadow-sm border border-border-light dark:border-border-dark space-y-4">
+                            <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2">শেয়ারিং এবং অ্যাক্সেস</h3>
+                            {/* Share Link Display */}
+                            <div>
+                                <label className="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1">শেয়ার লিংক</label>
+                                <div className="flex gap-2">
+                                    <input
+                                        readOnly
+                                        type="text"
+                                        value={`${window.location.origin}${window.location.pathname}#/form/${form.shareToken}`}
+                                        className="w-full bg-gray-100 dark:bg-black/40 border border-gray-300 dark:border-gray-700 rounded-md px-3 py-2 text-sm text-gray-600 dark:text-gray-400 font-mono"
+                                    />
+                                    <button
+                                        onClick={onCopyLink}
+                                        className="bg-cyan-100 dark:bg-cyan-900/30 text-cyan-700 dark:text-cyan-300 px-3 py-2 rounded-md hover:bg-cyan-200 dark:hover:bg-cyan-900/50 transition-colors"
+                                        title="Copy Link"
+                                    >
+                                        <span className="material-icons text-sm">content_copy</span>
+                                    </button>
+                                </div>
                             </div>
                         </div>
-                    </div>
+                    )}
 
-                    {/* Fields List */}
-                    <div className="space-y-4">
-                        {form.fields.map((field, index) => (
-                            <FieldCard
-                                key={field.id}
-                                field={field}
-                                index={index}
-                                onUpdate={handleUpdateField}
-                                onDelete={handleDeleteField}
-                            />
-                        ))}
-                        {form.fields.length === 0 && (
-                            <div className="text-center py-10 border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-lg">
-                                <p className="text-gray-500">কোনো ফিল্ড যোগ করা হয়নি। ডান পাশের টুলবক্স থেকে ফিল্ড যোগ করুন।</p>
+                    {activeTab === 'integration' && (
+                        <div className="space-y-6">
+                            <div className="bg-surface-light dark:bg-surface-dark p-6 rounded-lg shadow-sm border border-border-light dark:border-border-dark">
+                                <div className="flex items-center justify-between mb-6">
+                                    <div className="flex items-center">
+                                        <div className="h-10 w-10 bg-green-100 dark:bg-green-900/30 rounded-lg flex items-center justify-center mr-3">
+                                            <span className="material-icons text-green-600 dark:text-green-400">description</span>
+                                        </div>
+                                        <div>
+                                            <h3 className="text-lg font-bold text-gray-900 dark:text-white">Google Drive & Sheets</h3>
+                                            <p className="text-xs text-gray-500">ডাটা এবং ফাইল সরাসরি গুগল ড্রাইভে সেভ করুন</p>
+                                        </div>
+                                    </div>
+                                    <label className="relative inline-flex items-center cursor-pointer">
+                                        <input
+                                            type="checkbox"
+                                            checked={form.googleIntegration?.enabled || false}
+                                            onChange={(e) => setForm(prev => prev ? { ...prev, googleIntegration: { ...prev.googleIntegration, scriptUrl: prev.googleIntegration?.scriptUrl || '', enabled: e.target.checked } } : null)}
+                                            className="sr-only peer"
+                                        />
+                                        <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-green-500"></div>
+                                    </label>
+                                </div>
+
+                                <div className={`space-y-4 transition-opacity ${form.googleIntegration?.enabled ? 'opacity-100' : 'opacity-50 pointer-events-none'}`}>
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Google Apps Script Web App URL</label>
+                                        <input
+                                            type="text"
+                                            value={form.googleIntegration?.scriptUrl || ''}
+                                            onChange={(e) => setForm(prev => prev ? { ...prev, googleIntegration: { ...prev.googleIntegration, enabled: prev.googleIntegration?.enabled || false, scriptUrl: e.target.value } } : null)}
+                                            placeholder="https://script.google.com/macros/s/.../exec"
+                                            className="w-full bg-white dark:bg-background-dark border border-gray-300 dark:border-gray-600 rounded-md px-4 py-2 text-gray-900 dark:text-white focus:ring-primary focus:border-primary shadow-sm"
+                                        />
+                                    </div>
+
+                                    <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg border border-blue-100 dark:border-blue-900/50">
+                                        <h4 className="text-sm font-bold text-blue-800 dark:text-blue-300 mb-2 flex items-center">
+                                            <span className="material-icons text-sm mr-1">help_outline</span>
+                                            এটি কীভাবে সেটআপ করবেন?
+                                        </h4>
+                                        <ol className="text-xs text-blue-700 dark:text-blue-400 space-y-2 list-decimal ml-4">
+                                            <li><span className="font-bold">Google Apps Script</span> ওপেন করুন এবং আমি যে কোডটি দিয়েছি তা পেস্ট করুন।</li>
+                                            <li><span className="font-bold">Deploy {'>'} New Deployment</span> এ ব্লিক করুন।</li>
+                                            <li>Select Type এ <span className="font-bold">Web App</span> সিলেক্ট করুন।</li>
+                                            <li>Who has access এ <span className="font-bold">Anyone</span> সিলেক্ট করে Deploy করুন।</li>
+                                            <li>প্রাপ্ত Web App URL টি উপরের বক্সে পেস্ট করুন।</li>
+                                        </ol>
+                                    </div>
+                                </div>
                             </div>
-                        )}
-                    </div>
+                        </div>
+                    )}
                 </div>
 
                 {/* Toolbox Sidebar */}
                 <div className="lg:col-span-1">
-                    <div className="bg-surface-light dark:bg-surface-dark p-4 rounded-lg shadow-sm border border-border-light dark:border-border-dark sticky top-24">
-                        <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-4">ফিল্ড টুলবক্স</h3>
-                        <div className="grid grid-cols-1 gap-2">
-                            {FIELD_TYPES.map(type => (
-                                <button
-                                    key={type.type}
-                                    onClick={() => handleAddField(type.type)}
-                                    className="flex items-center p-3 bg-gray-50 dark:bg-black/20 hover:bg-gray-100 dark:hover:bg-gray-700 border border-gray-200 dark:border-gray-700 rounded transition-colors text-left"
-                                >
-                                    <span className="material-icons text-gray-500 dark:text-gray-400 mr-3">{type.icon}</span>
-                                    <span className="text-sm font-medium text-gray-700 dark:text-gray-200">{type.label}</span>
-                                </button>
-                            ))}
+                    {activeTab === 'fields' ? (
+                        <div className="bg-surface-light dark:bg-surface-dark p-4 rounded-lg shadow-sm border border-border-light dark:border-border-dark sticky top-24">
+                            <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-4">ফিল্ড টুলবক্স</h3>
+                            <div className="grid grid-cols-1 gap-2">
+                                {FIELD_TYPES.map(type => (
+                                    <button
+                                        key={type.type}
+                                        onClick={() => handleAddField(type.type)}
+                                        className="flex items-center p-3 bg-gray-50 dark:bg-black/20 hover:bg-gray-100 dark:hover:bg-gray-700 border border-gray-200 dark:border-gray-700 rounded transition-colors text-left"
+                                    >
+                                        <span className="material-icons text-gray-500 dark:text-gray-400 mr-3">{type.icon}</span>
+                                        <span className="text-sm font-medium text-gray-700 dark:text-gray-200">{type.label}</span>
+                                    </button>
+                                ))}
+                            </div>
                         </div>
-                    </div>
+                    ) : (
+                        <div className="bg-surface-light dark:bg-surface-dark p-4 rounded-lg shadow-sm border border-border-light dark:border-border-dark sticky top-24">
+                            <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-4">টিপস</h3>
+                            <p className="text-sm text-gray-500 dark:text-gray-400">
+                                ইন্টিগ্রেশন এনাবল করলে প্রতিটি সাবমিশন সাথে সাথে আপনার পছন্দের গুগল শীটে জমা হবে। ফাইলগুলো আপনার নামে গুগল ড্রাইভে একটি ফোল্ডার তৈরি করে সেখানে রাখা হবে।
+                            </p>
+                        </div>
+                    )}
                 </div>
             </div>
         </div>

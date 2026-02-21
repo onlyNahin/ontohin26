@@ -140,6 +140,10 @@ export interface CustomForm {
     status: 'published' | 'draft';
     createdAt: string;
     shareToken?: string;
+    googleIntegration?: {
+        scriptUrl: string;
+        enabled: boolean;
+    };
 }
 
 export interface AnalyticsData {
