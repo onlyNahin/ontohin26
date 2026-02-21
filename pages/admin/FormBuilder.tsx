@@ -30,7 +30,7 @@ export const FormBuilder: React.FC<FormBuilderProps> = ({ forms, setForms }) => 
 
     const handleCreateNew = () => {
         const newForm: CustomForm = {
-            id: Date.now().toString(),
+            id: `temp_${Date.now()}`,
             title: 'নতুন ফর্ম',
             description: '',
             fields: [],
@@ -76,16 +76,21 @@ export const FormBuilder: React.FC<FormBuilderProps> = ({ forms, setForms }) => 
     const handleSaveForm = async () => {
         if (currentForm) {
             try {
-                if (currentForm.id && forms.find(f => f.id === currentForm.id)) {
+                if (currentForm.id && !currentForm.id.startsWith('temp_')) {
+                    // Update existing form
                     const { id, ...data } = currentForm;
                     await updateDoc(doc(db, 'forms', id), data);
                 } else {
-                    await addDoc(collection(db, 'forms'), currentForm);
+                    // Create new form - remove temporary ID to let Firestore generate its own
+                    const { id, ...data } = currentForm;
+                    await addDoc(collection(db, 'forms'), data);
                 }
+                alert('ফর্মটি সফলভাবে সেভ করা হয়েছে!');
                 setView('list');
                 setCurrentForm(null);
             } catch (error) {
                 console.error("Error saving form: ", error);
+                alert('ফর্ম সেভ করতে সমস্যা হয়েছে। অনুগ্রহ করে পুনরায় চেষ্টা করুন।');
             }
         }
     };
