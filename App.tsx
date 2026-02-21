@@ -219,7 +219,7 @@ function App() {
                   <Route path="identity" element={<SiteIdentity heroData={heroData} />} />
                   <Route path="about" element={<AboutManager aboutData={aboutData} />} />
                   <Route path="history" element={<HistoryManager historyData={historyData} />} />
-                  <Route path="gallery" element={<GalleryRedirects galleryItems={galleryItems} redirectLinks={redirectLinks} />} />
+                  <Route path="gallery" element={<GalleryRedirects galleryItems={galleryItems} links={redirectLinks} />} />
                   <Route path="footer" element={<FooterManager footerData={footerData} />} />
                   <Route path="settings" element={<Settings />} />
                   <Route path="*" element={<Navigate to="dashboard" replace />} />
