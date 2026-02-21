@@ -3,7 +3,7 @@ import { Navbar } from '../components/Navbar';
 import { Footer } from '../components/Footer';
 import { GALLERY_ITEMS, INITIAL_EVENTS, INITIAL_HERO_DATA } from '../constants';
 import { useNavigate } from 'react-router-dom';
-import { AboutSectionData, FooterData, HeroData, Event, EventRegistration } from '../types';
+import { AboutSectionData, FooterData, HeroData, Event, EventRegistration, GalleryItem } from '../types';
 import { EventRegistrationModal } from '../components/EventRegistrationModal';
 import { ThankYouModal } from '../components/ThankYouModal';
 
@@ -14,10 +14,11 @@ interface HomeProps {
   footerData?: FooterData;
   heroData?: HeroData;
   events?: Event[];
+  galleryItems?: GalleryItem[];
   onRegister?: (data: EventRegistration, event: Event) => void;
 }
 
-export const Home: React.FC<HomeProps> = ({ darkMode, toggleTheme, aboutData, footerData, heroData, events, onRegister }) => {
+export const Home: React.FC<HomeProps> = ({ darkMode, toggleTheme, aboutData, footerData, heroData, events, galleryItems, onRegister }) => {
   const navigate = useNavigate();
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
   const [showThankYou, setShowThankYou] = useState(false);
@@ -204,7 +205,11 @@ export const Home: React.FC<HomeProps> = ({ darkMode, toggleTheme, aboutData, fo
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 auto-rows-[200px]">
-              {GALLERY_ITEMS.map((item, index) => (
+              {(galleryItems && galleryItems.length > 0 ? (
+                galleryItems.some(i => i.featured)
+                  ? galleryItems.filter(i => i.featured)
+                  : galleryItems.slice(0, 4)
+              ) : GALLERY_ITEMS).slice(0, 4).map((item, index) => (
                 <div key={item.id} className={`group relative overflow-hidden rounded-sm cursor-pointer ${index === 0 || index === 3 ? 'md:col-span-2 md:row-span-2' : ''}`} onClick={() => navigate('/gallery')}>
                   <img
                     src={item.imageUrl}

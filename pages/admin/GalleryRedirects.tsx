@@ -114,6 +114,14 @@ export const GalleryRedirects: React.FC<GalleryRedirectsProps> = ({ links, galle
         }
     };
 
+    const handleToggleFeatured = async (item: GalleryItem) => {
+        try {
+            await updateDoc(doc(db, 'gallery', item.id), { featured: !item.featured });
+        } catch (error) {
+            console.error("Error updating image: ", error);
+        }
+    };
+
     return (
         <div className="space-y-8 pb-10">
             <div>
@@ -225,7 +233,14 @@ export const GalleryRedirects: React.FC<GalleryRedirectsProps> = ({ links, galle
                         <div key={item.id} className="group relative aspect-square bg-gray-100 dark:bg-black rounded-lg overflow-hidden border border-gray-200 dark:border-gray-800 hover:border-primary dark:hover:border-primary transition-all">
                             <img src={item.imageUrl} alt={item.title} className="w-full h-full object-cover" />
                             <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-between p-3">
-                                <div className="flex justify-end">
+                                <div className="flex justify-between items-start">
+                                    <button
+                                        onClick={() => handleToggleFeatured(item)}
+                                        className={`p-1 rounded-full transition-colors shadow-lg ${item.featured ? 'bg-yellow-400 text-black' : 'bg-black/40 text-white hover:bg-yellow-400 hover:text-black'}`}
+                                        title={item.featured ? "Unmark as Featured" : "Mark as Featured"}
+                                    >
+                                        <span className="material-icons text-sm">{item.featured ? 'star' : 'star_outline'}</span>
+                                    </button>
                                     <button
                                         onClick={() => handleDeleteImage(item.id)}
                                         className="bg-red-500 text-white p-1 rounded-full hover:bg-red-600 transition-colors shadow-lg"

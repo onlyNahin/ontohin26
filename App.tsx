@@ -192,7 +192,7 @@ function App() {
   return (
     <Router>
       <Routes>
-        <Route path="/" element={<Home darkMode={darkMode} toggleTheme={toggleTheme} aboutData={aboutData} footerData={footerData} heroData={heroData} events={events} onRegister={handleRegistrationSubmit} />} />
+        <Route path="/" element={<Home darkMode={darkMode} toggleTheme={toggleTheme} aboutData={aboutData} footerData={footerData} heroData={heroData} events={events} galleryItems={galleryItems} onRegister={handleRegistrationSubmit} />} />
         <Route path="/gallery" element={<Gallery darkMode={darkMode} toggleTheme={toggleTheme} redirectLinks={redirectLinks} galleryItems={galleryItems} footerData={footerData} />} />
         <Route path="/history" element={<History darkMode={darkMode} toggleTheme={toggleTheme} historyData={historyData} footerData={footerData} />} />
         <Route path="/announcements" element={<Announcements darkMode={darkMode} toggleTheme={toggleTheme} announcements={announcements} footerData={footerData} />} />

@@ -18,6 +18,7 @@ export interface GalleryItem {
     category: string;
     imageUrl: string;
     date: string;
+    featured?: boolean;
 }
 
 export interface NavItem {
