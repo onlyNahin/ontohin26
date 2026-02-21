@@ -1,7 +1,7 @@
 import React from 'react';
 import { FooterData } from '../../types';
 import { db } from '../../firebase';
-import { doc, updateDoc } from 'firebase/firestore';
+import { doc, setDoc } from 'firebase/firestore';
 
 interface FooterManagerProps {
     footerData: FooterData;
@@ -11,7 +11,7 @@ export const FooterManager: React.FC<FooterManagerProps> = ({ footerData }) => {
     const handleChange = async (field: keyof FooterData, value: string) => {
         try {
             const footerRef = doc(db, 'metadata', 'footer');
-            await updateDoc(footerRef, { [field]: value });
+            await setDoc(footerRef, { [field]: value }, { merge: true });
         } catch (error) {
             console.error("Error updating footer data: ", error);
         }

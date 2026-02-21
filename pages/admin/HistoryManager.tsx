@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { HistoryPageData, HistoryContentBlock } from '../../types';
 import { db } from '../../firebase';
-import { doc, updateDoc } from 'firebase/firestore';
+import { doc, setDoc } from 'firebase/firestore';
 
 interface HistoryManagerProps {
     historyData: HistoryPageData;
@@ -14,7 +14,7 @@ export const HistoryManager: React.FC<HistoryManagerProps> = ({ historyData }) =
     const handleMainChange = async (field: keyof HistoryPageData, value: string) => {
         try {
             const historyRef = doc(db, 'metadata', 'history');
-            await updateDoc(historyRef, { [field]: value });
+            await setDoc(historyRef, { [field]: value }, { merge: true });
         } catch (error) {
             console.error("Error updating history data: ", error);
         }
@@ -43,7 +43,7 @@ export const HistoryManager: React.FC<HistoryManagerProps> = ({ historyData }) =
     const handleSaveBlocks = async () => {
         try {
             const historyRef = doc(db, 'metadata', 'history');
-            await updateDoc(historyRef, { contentBlocks: tempBlocks });
+            await setDoc(historyRef, { contentBlocks: tempBlocks }, { merge: true });
             alert('ইতিহাস পেজের কন্টেন্ট আপডেট করা হয়েছে!');
         } catch (error) {
             console.error("Error saving blocks: ", error);

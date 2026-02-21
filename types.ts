@@ -1,29 +1,29 @@
 export type EventStatus = 'Published' | 'Draft' | 'Archived';
 
 export interface Event {
-  id: string;
-  title: string;
-  date: string;
-  time: string;
-  location: string;
-  description: string;
-  status: EventStatus;
-  imageUrl?: string;
-  category: string;
+    id: string;
+    title: string;
+    date: string;
+    time: string;
+    location: string;
+    description: string;
+    status: EventStatus;
+    imageUrl?: string;
+    category: string;
 }
 
 export interface GalleryItem {
-  id: string;
-  title: string;
-  category: string;
-  imageUrl: string;
-  date: string;
+    id: string;
+    title: string;
+    category: string;
+    imageUrl: string;
+    date: string;
 }
 
 export interface NavItem {
-  label: string;
-  href: string;
-  isPage?: boolean;
+    label: string;
+    href: string;
+    isPage?: boolean;
 }
 
 export interface Announcement {
@@ -36,11 +36,11 @@ export interface Announcement {
 }
 
 export interface Stat {
-  label: string;
-  value: string;
-  icon: string;
-  color: string;
-  bg: string;
+    label: string;
+    value: string;
+    icon: string;
+    color: string;
+    bg: string;
 }
 
 export interface RedirectLink {
@@ -100,6 +100,7 @@ export interface HeroData {
     subtitle: string;
     imageUrl: string;
     button: HeroButton;
+    favicon?: string;
 }
 
 export interface EventRegistration {

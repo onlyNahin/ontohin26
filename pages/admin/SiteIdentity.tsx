@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { HeroData } from '../../types';
 import { db } from '../../firebase';
-import { doc, updateDoc } from 'firebase/firestore';
+import { doc, setDoc } from 'firebase/firestore';
 
 interface SiteIdentityProps {
     heroData: HeroData;
@@ -31,9 +31,9 @@ export const SiteIdentity: React.FC<SiteIdentityProps> = ({ heroData }) => {
 
     const handleSave = async () => {
         try {
-            // Update Hero Data in Firestore
+            // Update Hero Data in Firestore (including favicon)
             const heroRef = doc(db, 'metadata', 'hero');
-            await updateDoc(heroRef, heroData);
+            await setDoc(heroRef, { ...heroData, favicon }, { merge: true });
 
             // Update Favicon in DOM
             if (favicon) {
@@ -56,7 +56,7 @@ export const SiteIdentity: React.FC<SiteIdentityProps> = ({ heroData }) => {
     const handleHeroChange = async (field: keyof HeroData, value: string) => {
         try {
             const heroRef = doc(db, 'metadata', 'hero');
-            await updateDoc(heroRef, { [field]: value });
+            await setDoc(heroRef, { [field]: value }, { merge: true });
         } catch (error) {
             console.error("Error updating hero field: ", error);
         }
@@ -65,9 +65,9 @@ export const SiteIdentity: React.FC<SiteIdentityProps> = ({ heroData }) => {
     const handleButtonChange = async (field: keyof HeroData['button'], value: string) => {
         try {
             const heroRef = doc(db, 'metadata', 'hero');
-            await updateDoc(heroRef, {
+            await setDoc(heroRef, {
                 button: { ...heroData.button, [field]: value }
-            });
+            }, { merge: true });
         } catch (error) {
             console.error("Error updating hero button: ", error);
         }

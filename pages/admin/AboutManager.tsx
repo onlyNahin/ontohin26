@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { AboutSectionData, AboutCard } from '../../types';
 import { db } from '../../firebase';
-import { doc, updateDoc } from 'firebase/firestore';
+import { doc, setDoc } from 'firebase/firestore';
 
 interface AboutManagerProps {
     aboutData: AboutSectionData;
@@ -16,7 +16,7 @@ export const AboutManager: React.FC<AboutManagerProps> = ({ aboutData }) => {
     const handleMainChange = async (field: keyof AboutSectionData, value: string) => {
         try {
             const aboutRef = doc(db, 'metadata', 'about');
-            await updateDoc(aboutRef, { [field]: value });
+            await setDoc(aboutRef, { [field]: value }, { merge: true });
         } catch (error) {
             console.error("Error updating about data: ", error);
         }
@@ -30,7 +30,7 @@ export const AboutManager: React.FC<AboutManagerProps> = ({ aboutData }) => {
     const handleSaveCards = async () => {
         try {
             const aboutRef = doc(db, 'metadata', 'about');
-            await updateDoc(aboutRef, { cards: tempCards });
+            await setDoc(aboutRef, { cards: tempCards }, { merge: true });
             alert('কার্ডসমূহ আপডেট করা হয়েছে!');
         } catch (error) {
             console.error("Error saving cards: ", error);
