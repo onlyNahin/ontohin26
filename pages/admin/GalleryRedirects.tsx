@@ -269,7 +269,7 @@ export const GalleryRedirects: React.FC<GalleryRedirectsProps> = ({ links, galle
                 </div>
 
                 {/* Images Grid */}
-                <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 md:gap-4">
                     {galleryItems.map(item => (
                         <div key={item.id} className="group relative aspect-square bg-gray-100 dark:bg-black rounded-lg overflow-hidden border border-gray-200 dark:border-gray-800 hover:border-primary dark:hover:border-primary transition-all">
                             <img src={item.imageUrl} alt={item.title} className="w-full h-full object-cover" />
@@ -322,7 +322,7 @@ export const GalleryRedirects: React.FC<GalleryRedirectsProps> = ({ links, galle
                     </button>
                 </div>
 
-                <div className="overflow-hidden border border-border-light dark:border-border-dark rounded-md">
+                <div className="overflow-x-auto border border-border-light dark:border-border-dark rounded-md">
                     <table className="min-w-full divide-y divide-border-light dark:divide-border-dark">
                         <thead className="bg-gray-50 dark:bg-[#222]">
                             <tr>
@@ -366,7 +366,7 @@ export const GalleryRedirects: React.FC<GalleryRedirectsProps> = ({ links, galle
                                         // View Mode Rows
                                         <>
                                             <td className="px-4 py-3 text-sm text-gray-900 dark:text-white font-medium">{link.label}</td>
-                                            <td className="px-4 py-3 text-sm text-gray-500 dark:text-gray-400 font-mono truncate max-w-xs block sm:table-cell">{link.url}</td>
+                                            <td className="px-4 py-3 text-sm text-gray-500 dark:text-gray-400 font-mono truncate max-w-[150px] md:max-w-xs">{link.url}</td>
                                             <td className="px-4 py-3 text-right text-sm whitespace-nowrap">
                                                 <button onClick={() => handleEditLinkClick(link)} className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 transition-colors font-medium mr-3 inline-flex items-center">
                                                     <span className="material-icons text-base mr-1">edit</span> এডিট

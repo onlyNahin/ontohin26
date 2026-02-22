@@ -87,14 +87,14 @@ export const Home: React.FC<HomeProps> = ({ darkMode, toggleTheme, aboutData, hi
         }}
       >
         <div className="relative z-10 text-center px-4 max-w-5xl mx-auto mt-16 animate-fade-in">
-          <h1 className="text-5xl md:text-7xl lg:text-9xl font-display font-black text-white tracking-tight leading-none mb-6 drop-shadow-lg">
+          <h1 className="text-4xl md:text-7xl lg:text-8xl font-display font-black text-white tracking-tight leading-none mb-6 drop-shadow-lg">
             {hero.title}
           </h1>
-          <p className="text-xl md:text-2xl lg:text-3xl text-gray-200 font-light tracking-[0.2em] mb-12 uppercase drop-shadow-md">
+          <p className="text-base md:text-xl lg:text-2xl text-gray-200 font-light tracking-[0.2em] mb-12 uppercase drop-shadow-md">
             {hero.subtitle}
           </p>
           <div className="flex justify-center">
-            <button onClick={handleHeroAction} className="bg-primary text-white font-bold py-4 px-10 text-lg uppercase tracking-wider hover:bg-white hover:text-primary transition-all duration-300 shadow-lg transform hover:-translate-y-1 rounded-sm">
+            <button onClick={handleHeroAction} className="bg-primary text-white font-bold py-3 md:py-4 px-8 md:px-10 text-base md:text-lg uppercase tracking-wider hover:bg-white hover:text-primary transition-all duration-300 shadow-lg transform hover:-translate-y-1 rounded-sm">
               {hero.button.text}
             </button>
           </div>
@@ -111,21 +111,21 @@ export const Home: React.FC<HomeProps> = ({ darkMode, toggleTheme, aboutData, hi
         <section id="about" className="-mt-20 pt-32 pb-20 rounded-t-[3rem] bg-background-light dark:bg-background-dark shadow-[0_-20px_60px_-15px_rgba(0,0,0,0.5)]">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center max-w-3xl mx-auto mb-16">
-              <span className="text-primary font-bold tracking-widest uppercase text-sm">{data.subtitle}</span>
-              <h2 className="text-4xl md:text-5xl font-header font-bold text-gray-900 dark:text-white mt-4 mb-6">
+              <span className="text-primary font-bold tracking-widest uppercase text-xs md:text-sm">{data.subtitle}</span>
+              <h2 className="text-3xl md:text-5xl font-header font-bold text-gray-900 dark:text-white mt-4 mb-6">
                 {data.title}
               </h2>
-              <p className="text-lg text-gray-600 dark:text-gray-300 leading-relaxed">
+              <p className="text-base md:text-lg text-gray-600 dark:text-gray-300 leading-relaxed">
                 {data.description}
               </p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 md:gap-8 text-center">
               {data.cards.map(card => (
-                <div key={card.id} className="p-8 border border-gray-200 dark:border-gray-800 rounded-lg hover:border-primary transition-colors group">
-                  <span className="material-icons text-5xl text-gray-400 group-hover:text-primary mb-4 transition-colors">{card.icon}</span>
-                  <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">{card.title}</h3>
-                  <p className="text-gray-500 dark:text-gray-400">{card.description}</p>
+                <div key={card.id} className="p-6 md:p-8 border border-gray-200 dark:border-gray-800 rounded-lg hover:border-primary transition-colors group">
+                  <span className="material-icons text-4xl md:text-5xl text-gray-400 group-hover:text-primary mb-4 transition-colors">{card.icon}</span>
+                  <h3 className="text-lg md:text-xl font-bold text-gray-900 dark:text-white mb-2">{card.title}</h3>
+                  <p className="text-sm md:text-base text-gray-500 dark:text-gray-400">{card.description}</p>
                 </div>
               ))}
             </div>
@@ -143,11 +143,11 @@ export const Home: React.FC<HomeProps> = ({ darkMode, toggleTheme, aboutData, hi
               />
             </div>
             <div className="md:w-1/2">
-              <span className="text-primary font-bold tracking-widest uppercase text-sm">{history.headerSubtitle}</span>
-              <h2 className="text-4xl font-header font-bold text-gray-900 dark:text-white mt-4 mb-6">
+              <span className="text-primary font-bold tracking-widest uppercase text-xs md:text-sm">{history.headerSubtitle}</span>
+              <h2 className="text-3xl md:text-4xl font-header font-bold text-gray-900 dark:text-white mt-4 mb-6">
                 {history.headerTitle}
               </h2>
-              <div className="text-gray-600 dark:text-gray-300 mb-8 leading-relaxed line-clamp-6">
+              <div className="text-base md:text-lg text-gray-600 dark:text-gray-300 mb-8 leading-relaxed line-clamp-6">
                 {history.mainDescription}
               </div>
               <button onClick={() => navigate('/history')} className="text-primary font-bold uppercase tracking-widest text-sm border-b-2 border-primary pb-1 hover:text-red-700 hover:border-red-700 transition-colors">
@@ -159,15 +159,15 @@ export const Home: React.FC<HomeProps> = ({ darkMode, toggleTheme, aboutData, hi
 
         {/* EVENTS SECTION */}
         <section id="events" className="py-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
-          <div className="flex justify-between items-end mb-12">
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-12 gap-4">
             <div>
-              <span className="text-primary font-bold tracking-widest uppercase text-sm">দিনপঞ্জিকা</span>
-              <h2 className="text-4xl font-header font-bold text-gray-900 dark:text-white mt-2">আসন্ন ইভেন্টসমূহ</h2>
+              <span className="text-primary font-bold tracking-widest uppercase text-xs md:text-sm">দিনপঞ্জিকা</span>
+              <h2 className="text-3xl md:text-4xl font-header font-bold text-gray-900 dark:text-white mt-2">আসন্ন ইভেন্টসমূহ</h2>
             </div>
             <button onClick={scrollToEvents} className="hidden md:block text-gray-500 hover:text-primary transition-colors">সব ইভেন্ট দেখুন &rarr;</button>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {(events || INITIAL_EVENTS).map(event => (
               <div key={event.id} className="bg-surface-light dark:bg-surface-dark border border-gray-200 dark:border-gray-800 rounded-lg overflow-hidden hover:shadow-xl transition-all duration-300 group flex flex-col">
                 <div className="h-48 overflow-hidden relative">
@@ -207,8 +207,8 @@ export const Home: React.FC<HomeProps> = ({ darkMode, toggleTheme, aboutData, hi
         <section id="gallery" className="py-20 bg-gray-50 dark:bg-black transition-colors duration-300">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center mb-12">
-              <span className="text-primary font-bold tracking-widest uppercase text-sm">চিত্রসমূহ</span>
-              <h2 className="text-4xl font-header font-bold mt-2 text-gray-900 dark:text-white">স্মৃতির অ্যালবাম</h2>
+              <span className="text-primary font-bold tracking-widest uppercase text-xs md:text-sm">চিত্রসমূহ</span>
+              <h2 className="text-3xl md:text-4xl font-header font-bold mt-2 text-gray-900 dark:text-white">স্মৃতির অ্যালবাম</h2>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 auto-rows-[200px]">
@@ -223,16 +223,16 @@ export const Home: React.FC<HomeProps> = ({ darkMode, toggleTheme, aboutData, hi
                   : GALLERY_ITEMS.slice(0, 4);
 
                 return displayItems.map((item, index) => (
-                  <div key={item.id} className={`group relative overflow-hidden rounded-sm cursor-pointer ${index === 0 || index === 3 ? 'md:col-span-2 md:row-span-2' : ''}`} onClick={() => navigate('/gallery')}>
+                  <div key={item.id} className={`group relative overflow-hidden rounded-sm cursor-pointer ${index === 0 || index === 3 ? 'md:col-span-2 md:row-span-2 min-h-[300px]' : 'min-h-[200px]'}`} onClick={() => navigate('/gallery')}>
                     <img
                       src={item.imageUrl}
                       alt={item.title}
                       className="object-cover w-full h-full transform group-hover:scale-105 transition-transform duration-700 opacity-80 group-hover:opacity-100"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-transparent to-transparent opacity-60 group-hover:opacity-80 transition-opacity"></div>
-                    <div className="absolute bottom-0 left-0 p-6 translate-y-4 group-hover:translate-y-0 transition-transform duration-300">
-                      <span className="text-primary text-xs font-bold uppercase tracking-wider mb-1 block">{item.category}</span>
-                      <h3 className={`font-display font-bold text-white ${index === 0 || index === 3 ? 'text-2xl' : 'text-lg'}`}>{item.title}</h3>
+                    <div className="absolute bottom-0 left-0 p-4 md:p-6 translate-y-2 group-hover:translate-y-0 transition-transform duration-300">
+                      <span className="text-primary text-[10px] md:text-xs font-bold uppercase tracking-wider mb-1 block">{item.category}</span>
+                      <h3 className={`font-display font-bold text-white ${index === 0 || index === 3 ? 'text-xl md:text-2xl' : 'text-base md:text-lg'}`}>{item.title}</h3>
                     </div>
                   </div>
                 ));

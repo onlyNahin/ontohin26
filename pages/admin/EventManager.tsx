@@ -123,7 +123,7 @@ export const EventManager: React.FC<EventManagerProps> = ({ events }) => {
           <table className="min-w-full divide-y divide-border-light dark:divide-border-dark">
             <thead className="bg-gray-50 dark:bg-[#222]">
               <tr>
-                <th scope="col" className="px-6 py-4 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">ইভেন্টের নাম</th>
+                <th scope="col" className="px-6 py-4 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider min-w-[200px]">ইভেন্টের নাম</th>
                 <th scope="col" className="px-6 py-4 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">তারিখ</th>
                 <th scope="col" className="px-6 py-4 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">স্থান</th>
                 <th scope="col" className="px-6 py-4 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">স্ট্যাটাস</th>
