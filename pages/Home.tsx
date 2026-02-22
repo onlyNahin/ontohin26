@@ -74,6 +74,9 @@ export const Home: React.FC<HomeProps> = ({ darkMode, toggleTheme, aboutData, hi
     <div className="overflow-x-hidden">
       <Navbar darkMode={darkMode} toggleTheme={toggleTheme} />
 
+      {/* Hero Preload Hint */}
+      <img src={hero.imageUrl} className="hidden" fetchPriority="high" alt="" />
+
       {/* Hero Section */}
       <div
         className="relative h-screen min-h-[600px] flex items-center justify-center fixed-bg"

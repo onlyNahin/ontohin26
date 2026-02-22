@@ -169,7 +169,7 @@ export const INITIAL_FOOTER_DATA: FooterData = {
 export const INITIAL_HERO_DATA: HeroData = {
   title: 'অন্তহীন ২৬',
   subtitle: 'কলিজিয়েটের ঐতিহ্য',
-  imageUrl: 'https://images.unsplash.com/photo-1541339907198-e08756dedf3f?q=80&w=1920&auto=format&fit=crop',
+  imageUrl: 'https://i.ibb.co.com/SwBg8sJz/DSC02628.jpg',
   button: {
     text: 'ইভেন্ট দেখুন',
     url: 'events',
