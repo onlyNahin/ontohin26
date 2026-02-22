@@ -22,6 +22,7 @@ export const GalleryRedirects: React.FC<GalleryRedirectsProps> = ({ links, galle
     const [customCategory, setCustomCategory] = useState('');
     const [isCustomInput, setIsCustomInput] = useState(false);
     const [imageSrc, setImageSrc] = useState('');
+    const [isCompressing, setIsCompressing] = useState(false);
 
     // === Redirect Handlers ===
     const handleAddLink = async () => {
@@ -72,12 +73,51 @@ export const GalleryRedirects: React.FC<GalleryRedirectsProps> = ({ links, galle
     };
 
     // === Gallery Handlers ===
+    const compressImage = (base64Str: string): Promise<string> => {
+        return new Promise((resolve) => {
+            const img = new Image();
+            img.src = base64Str;
+            img.onload = () => {
+                const canvas = document.createElement('canvas');
+                const MAX_WIDTH = 1200;
+                const MAX_HEIGHT = 1200;
+                let width = img.width;
+                let height = img.height;
+
+                if (width > height) {
+                    if (width > MAX_WIDTH) {
+                        height *= MAX_WIDTH / width;
+                        width = MAX_WIDTH;
+                    }
+                } else {
+                    if (height > MAX_HEIGHT) {
+                        width *= MAX_HEIGHT / height;
+                        height = MAX_HEIGHT;
+                    }
+                }
+
+                canvas.width = width;
+                canvas.height = height;
+                const ctx = canvas.getContext('2d');
+                ctx?.drawImage(img, 0, 0, width, height);
+
+                // Compress to JPEG with 0.6 quality
+                const compressedBase64 = canvas.toDataURL('image/jpeg', 0.6);
+                resolve(compressedBase64);
+            };
+        });
+    };
+
     const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (file) {
+            setIsCompressing(true);
             const reader = new FileReader();
-            reader.onloadend = () => {
-                setImageSrc(reader.result as string);
+            reader.onloadend = async () => {
+                const base64 = reader.result as string;
+                const compressed = await compressImage(base64);
+                setImageSrc(compressed);
+                setIsCompressing(false);
             };
             reader.readAsDataURL(file);
         }
@@ -205,8 +245,9 @@ export const GalleryRedirects: React.FC<GalleryRedirectsProps> = ({ links, galle
                                 />
                                 <div className="relative">
                                     <input type="file" id="file_upload" accept="image/*" className="hidden" onChange={handleFileUpload} />
-                                    <label htmlFor="file_upload" className="cursor-pointer h-[38px] px-3 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 rounded-md flex items-center justify-center text-gray-700 dark:text-gray-200 transition-colors" title="Upload File">
-                                        <span className="material-icons text-lg">upload_file</span>
+                                    <label htmlFor="file_upload" className={`cursor-pointer h-[38px] px-3 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 rounded-md flex items-center justify-center text-gray-700 dark:text-gray-200 transition-colors ${isCompressing ? 'opacity-50 cursor-wait' : ''}`} title="Upload File">
+                                        <span className="material-icons text-lg">{isCompressing ? 'sync' : 'upload_file'}</span>
+                                        {isCompressing && <span className="ml-1 text-[10px] whitespace-nowrap">প্রসেসিং...</span>}
                                     </label>
                                 </div>
                                 <button
