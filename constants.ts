@@ -134,7 +134,7 @@ export const INITIAL_HISTORY_DATA: HistoryPageData = {
   headerSubtitle: 'স্থাপিত ১৮২৮',
   headerTitle: 'কলিজিয়েটের উপাখ্যান',
   mainDescription: 'রাজশাহী কলিজিয়েট স্কুল কেবল একটি শিক্ষা প্রতিষ্ঠান নয়; এটি ইতিহাসের সাক্ষী। ব্রিটিশ রাজের সময় ১৮২৮ সালে "বাউলিয়া ইংলিশ স্কুল" হিসেবে প্রতিষ্ঠিত, এটি বাংলায় প্রথম আধুনিক শিক্ষা প্রতিষ্ঠান এবং ভারতীয় উপমহাদেশের অন্যতম প্রাচীন প্রতিষ্ঠান হিসেবে দাঁড়িয়ে আছে।',
-  imageUrl: 'https://images.unsplash.com/photo-1577030838186-b41314787a71?q=80&w=1000&auto=format&fit=crop',
+  imageUrl: 'https://images.unsplash.com/photo-1523050853051-f050590c41ac?q=80&w=1000&auto=format&fit=crop',
   contentBlocks: [
     {
       id: '1',

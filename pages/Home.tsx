@@ -3,7 +3,7 @@ import { Navbar } from '../components/Navbar';
 import { Footer } from '../components/Footer';
 import { GALLERY_ITEMS, INITIAL_EVENTS, INITIAL_HERO_DATA } from '../constants';
 import { useNavigate } from 'react-router-dom';
-import { AboutSectionData, FooterData, HeroData, Event, EventRegistration, GalleryItem } from '../types';
+import { AboutSectionData, HistoryPageData, FooterData, HeroData, Event, EventRegistration, GalleryItem } from '../types';
 import { EventRegistrationModal } from '../components/EventRegistrationModal';
 import { ThankYouModal } from '../components/ThankYouModal';
 
@@ -11,6 +11,7 @@ interface HomeProps {
   darkMode: boolean;
   toggleTheme: () => void;
   aboutData?: AboutSectionData;
+  historyData?: HistoryPageData;
   footerData?: FooterData;
   heroData?: HeroData;
   events?: Event[];
@@ -18,7 +19,7 @@ interface HomeProps {
   onRegister?: (data: EventRegistration, event: Event) => void;
 }
 
-export const Home: React.FC<HomeProps> = ({ darkMode, toggleTheme, aboutData, footerData, heroData, events, galleryItems, onRegister }) => {
+export const Home: React.FC<HomeProps> = ({ darkMode, toggleTheme, aboutData, historyData, footerData, heroData, events, galleryItems, onRegister }) => {
   const navigate = useNavigate();
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
   const [showThankYou, setShowThankYou] = useState(false);
@@ -33,6 +34,12 @@ export const Home: React.FC<HomeProps> = ({ darkMode, toggleTheme, aboutData, fo
   };
 
   const hero = heroData || INITIAL_HERO_DATA;
+  const history = historyData || {
+    headerSubtitle: 'আমাদের ঐতিহ্য',
+    headerTitle: '১৮২৮ এর প্রতিধ্বনি',
+    mainDescription: 'রাজশাহী কলিজিয়েট স্কুল বাংলায় শিক্ষার একটি স্মৃতিস্তম্ভ হিসেবে দাঁড়িয়ে আছে। ১৮২৮ সালে প্রতিষ্ঠিত, এটি প্রজন্মের পর প্রজন্ম ধরে নেতা, চিন্তাবিদ এবং স্বপ্নদ্রষ্টাদের তৈরি করেছে।',
+    imageUrl: 'https://images.unsplash.com/photo-1523050853051-f050590c41ac?q=80&w=1000&auto=format&fit=crop'
+  };
 
   const handleHeroAction = () => {
     const { type, url } = hero.button;
@@ -127,22 +134,19 @@ export const Home: React.FC<HomeProps> = ({ darkMode, toggleTheme, aboutData, fo
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center gap-12">
             <div className="md:w-1/2">
               <img
-                src="https://images.unsplash.com/photo-1577030838186-b41314787a71?q=80&w=1000&auto=format&fit=crop"
+                src={history.imageUrl}
                 alt="School History"
-                className="rounded-lg shadow-2xl grayscale hover:grayscale-0 transition-all duration-700"
+                className="rounded-lg shadow-2xl grayscale hover:grayscale-0 transition-all duration-700 w-full"
               />
             </div>
             <div className="md:w-1/2">
-              <span className="text-primary font-bold tracking-widest uppercase text-sm">আমাদের ঐতিহ্য</span>
+              <span className="text-primary font-bold tracking-widest uppercase text-sm">{history.headerSubtitle}</span>
               <h2 className="text-4xl font-header font-bold text-gray-900 dark:text-white mt-4 mb-6">
-                ১৮২৮ এর প্রতিধ্বনি
+                {history.headerTitle}
               </h2>
-              <p className="text-gray-600 dark:text-gray-300 mb-6 leading-relaxed">
-                রাজশাহী কলিজিয়েট স্কুল বাংলায় শিক্ষার একটি স্মৃতিস্তম্ভ হিসেবে দাঁড়িয়ে আছে। ১৮২৮ সালে প্রতিষ্ঠিত, এটি প্রজন্মের পর প্রজন্ম ধরে নেতা, চিন্তাবিদ এবং স্বপ্নদ্রষ্টাদের তৈরি করেছে।
-              </p>
-              <p className="text-gray-600 dark:text-gray-300 mb-8 leading-relaxed">
-                ২০২৬ সালের ব্যাচ হিসেবে, আমরা আমাদের পূর্বসূরীদের মতো একই হল দিয়ে হাঁটি। আমরা প্রায় দুই শতাব্দী প্রাচীন এক ঐতিহ্যের ধারক। আমাদের ইতিহাস কেবল অতীতে নয়; এটি আমাদের দ্বারা প্রতিদিন লেখা হচ্ছে।
-              </p>
+              <div className="text-gray-600 dark:text-gray-300 mb-8 leading-relaxed line-clamp-6">
+                {history.mainDescription}
+              </div>
               <button onClick={() => navigate('/history')} className="text-primary font-bold uppercase tracking-widest text-sm border-b-2 border-primary pb-1 hover:text-red-700 hover:border-red-700 transition-colors">
                 সম্পূর্ণ ইতিহাস পড়ুন
               </button>
