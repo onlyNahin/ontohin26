@@ -42,6 +42,7 @@ export const Home: React.FC<HomeProps> = ({ darkMode, toggleTheme, aboutData, hi
   };
 
   const handleHeroAction = () => {
+    if (!hero?.button) return;
     const { type, url } = hero.button;
     if (type === 'scroll') {
       const element = document.getElementById(url);
@@ -95,7 +96,7 @@ export const Home: React.FC<HomeProps> = ({ darkMode, toggleTheme, aboutData, hi
           </p>
           <div className="flex justify-center">
             <button onClick={handleHeroAction} className="bg-primary text-white font-bold py-3 md:py-4 px-8 md:px-10 text-base md:text-lg uppercase tracking-wider hover:bg-white hover:text-primary transition-all duration-300 shadow-lg transform hover:-translate-y-1 rounded-sm">
-              {hero.button.text}
+              {hero.button?.text || 'অন্বেষণ করুন'}
             </button>
           </div>
         </div>
@@ -121,7 +122,7 @@ export const Home: React.FC<HomeProps> = ({ darkMode, toggleTheme, aboutData, hi
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 md:gap-8 text-center">
-              {data.cards.map(card => (
+              {(data?.cards || []).map(card => (
                 <div key={card.id} className="p-6 md:p-8 border border-gray-200 dark:border-gray-800 rounded-lg hover:border-primary transition-colors group">
                   <span className="material-icons text-4xl md:text-5xl text-gray-400 group-hover:text-primary mb-4 transition-colors">{card.icon}</span>
                   <h3 className="text-lg md:text-xl font-bold text-gray-900 dark:text-white mb-2">{card.title}</h3>
@@ -173,8 +174,12 @@ export const Home: React.FC<HomeProps> = ({ darkMode, toggleTheme, aboutData, hi
                 <div className="h-48 overflow-hidden relative">
                   <img src={event.imageUrl} alt={event.title} className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-500" />
                   <div className="absolute top-4 right-4 bg-white/90 dark:bg-black/90 backdrop-blur text-center px-3 py-1 rounded">
-                    <div className="text-xs font-bold uppercase text-red-500">{new Date(event.date).toLocaleString('bn-BD', { month: 'short' })}</div>
-                    <div className="text-xl font-bold text-gray-900 dark:text-white">{new Date(event.date).getDate()}</div>
+                    <div className="text-xs font-bold uppercase text-red-500">
+                      {event.date ? new Date(event.date).toLocaleString('bn-BD', { month: 'short' }) : '---'}
+                    </div>
+                    <div className="text-xl font-bold text-gray-900 dark:text-white">
+                      {event.date ? new Date(event.date).getDate() : '--'}
+                    </div>
                   </div>
                 </div>
                 <div className="p-6 flex-1 flex flex-col">
@@ -218,7 +223,9 @@ export const Home: React.FC<HomeProps> = ({ darkMode, toggleTheme, aboutData, hi
                   ? [...realItems].sort((a, b) => {
                     if (a.featured && !b.featured) return -1;
                     if (!a.featured && b.featured) return 1;
-                    return new Date(b.date).getTime() - new Date(a.date).getTime();
+                    const dateA = a.date ? new Date(a.date).getTime() : 0;
+                    const dateB = b.date ? new Date(b.date).getTime() : 0;
+                    return dateB - dateA;
                   }).slice(0, 4)
                   : GALLERY_ITEMS.slice(0, 4);
 
