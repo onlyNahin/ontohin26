@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { AboutSectionData, AboutCard } from '../../types';
 import { db } from '../../firebase';
 import { doc, setDoc } from 'firebase/firestore';
@@ -8,34 +8,35 @@ interface AboutManagerProps {
 }
 
 export const AboutManager: React.FC<AboutManagerProps> = ({ aboutData }) => {
-    // Local state for handling card edits
-    const [editingCardId, setEditingCardId] = useState<string | null>(null);
-    const [tempCards, setTempCards] = useState<AboutCard[]>(aboutData.cards);
+    // Local state for all fields to ensure smooth editing and consolidated saving
+    const [localData, setLocalData] = useState<AboutSectionData>({
+        title: aboutData?.title || '',
+        subtitle: aboutData?.subtitle || '',
+        description: aboutData?.description || '',
+        cards: aboutData?.cards || []
+    });
 
-    // Main fields handlers
-    const handleMainChange = async (field: keyof AboutSectionData, value: string) => {
-        try {
-            const aboutRef = doc(db, 'metadata', 'about');
-            await setDoc(aboutRef, { [field]: value }, { merge: true });
-        } catch (error) {
-            console.error("Error updating about data: ", error);
+    // Sync local state when incoming props change (e.g., after a save or remote update)
+    useEffect(() => {
+        if (aboutData) {
+            setLocalData({
+                title: aboutData.title || '',
+                subtitle: aboutData.subtitle || '',
+                description: aboutData.description || '',
+                cards: aboutData.cards || []
+            });
         }
+    }, [aboutData]);
+
+    const handleMainChange = (field: keyof AboutSectionData, value: string) => {
+        setLocalData(prev => ({ ...prev, [field]: value }));
     };
 
-    // Card handlers
     const handleCardChange = (id: string, field: keyof AboutCard, value: string) => {
-        setTempCards(prev => prev.map(card => card.id === id ? { ...card, [field]: value } : card));
-    };
-
-    const handleSaveCards = async () => {
-        try {
-            const aboutRef = doc(db, 'metadata', 'about');
-            await setDoc(aboutRef, { cards: tempCards }, { merge: true });
-            alert('কার্ডসমূহ আপডেট করা হয়েছে!');
-        } catch (error) {
-            console.error("Error saving cards: ", error);
-            alert('সেভ করতে সমস্যা হয়েছে।');
-        }
+        setLocalData(prev => ({
+            ...prev,
+            cards: prev.cards.map(card => card.id === id ? { ...card, [field]: value } : card)
+        }));
     };
 
     const handleAddCard = () => {
@@ -45,15 +46,29 @@ export const AboutManager: React.FC<AboutManagerProps> = ({ aboutData }) => {
             title: 'নতুন বৈশিষ্ট্য',
             description: 'বর্ণনা লিখুন...'
         };
-        setTempCards([...tempCards, newCard]);
-        // Also sync with main data immediately or require save? 
-        // Let's require save for bulk edits, but for add/delete maybe immediate? 
-        // For simplicity let's keep tempCards separate until "Save" is clicked for the cards section.
+        setLocalData(prev => ({
+            ...prev,
+            cards: [...prev.cards, newCard]
+        }));
     };
 
     const handleDeleteCard = (id: string) => {
         if (window.confirm('আপনি কি এই কার্ডটি মুছে ফেলতে চান?')) {
-            setTempCards(tempCards.filter(c => c.id !== id));
+            setLocalData(prev => ({
+                ...prev,
+                cards: prev.cards.filter(c => c.id !== id)
+            }));
+        }
+    };
+
+    const handleSaveAll = async () => {
+        try {
+            const aboutRef = doc(db, 'metadata', 'about');
+            await setDoc(aboutRef, localData, { merge: true });
+            alert('সফলভাবে সংরক্ষিত হয়েছে!');
+        } catch (error) {
+            console.error("Error saving about data: ", error);
+            alert('সেভ করতে সমস্যা হয়েছে।');
         }
     };
 
@@ -75,7 +90,7 @@ export const AboutManager: React.FC<AboutManagerProps> = ({ aboutData }) => {
                         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">সাবটাইটেল (ছোট টেক্সট)</label>
                         <input
                             type="text"
-                            value={aboutData.subtitle}
+                            value={localData.subtitle}
                             onChange={(e) => handleMainChange('subtitle', e.target.value)}
                             className="w-full bg-white dark:bg-background-dark border border-gray-300 dark:border-gray-600 rounded-md px-4 py-2 text-gray-900 dark:text-white focus:ring-primary focus:border-primary shadow-sm"
                         />
@@ -84,7 +99,7 @@ export const AboutManager: React.FC<AboutManagerProps> = ({ aboutData }) => {
                         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">মেইন টাইটেল</label>
                         <input
                             type="text"
-                            value={aboutData.title}
+                            value={localData.title}
                             onChange={(e) => handleMainChange('title', e.target.value)}
                             className="w-full bg-white dark:bg-background-dark border border-gray-300 dark:border-gray-600 rounded-md px-4 py-2 text-gray-900 dark:text-white focus:ring-primary focus:border-primary shadow-sm"
                         />
@@ -93,7 +108,7 @@ export const AboutManager: React.FC<AboutManagerProps> = ({ aboutData }) => {
                         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">বিবরণ</label>
                         <textarea
                             rows={4}
-                            value={aboutData.description}
+                            value={localData.description}
                             onChange={(e) => handleMainChange('description', e.target.value)}
                             className="w-full bg-white dark:bg-background-dark border border-gray-300 dark:border-gray-600 rounded-md px-4 py-2 text-gray-900 dark:text-white focus:ring-primary focus:border-primary shadow-sm"
                         />
@@ -117,7 +132,7 @@ export const AboutManager: React.FC<AboutManagerProps> = ({ aboutData }) => {
                 </div>
 
                 <div className="space-y-4">
-                    {tempCards.map((card, index) => (
+                    {localData.cards.map((card, index) => (
                         <div key={card.id} className="border border-gray-200 dark:border-gray-700 rounded-lg p-4 bg-gray-50 dark:bg-black/20">
                             <div className="flex justify-between items-start mb-4">
                                 <h4 className="text-sm font-bold text-gray-500 uppercase">কার্ড #{index + 1}</h4>
@@ -162,13 +177,13 @@ export const AboutManager: React.FC<AboutManagerProps> = ({ aboutData }) => {
                         </div>
                     ))}
                 </div>
+            </div>
 
-                <div className="mt-6 flex justify-end">
-                    <button onClick={handleSaveCards} className="bg-primary hover:bg-primary-hover text-white px-6 py-2 rounded shadow-lg transition-colors font-medium flex items-center">
-                        <span className="material-icons mr-2 text-sm">save</span>
-                        কার্ডগুলো সেভ করুন
-                    </button>
-                </div>
+            <div className="flex justify-end">
+                <button onClick={handleSaveAll} className="bg-primary hover:bg-primary-hover text-white px-8 py-3 rounded-lg shadow-xl transition-all font-bold flex items-center transform hover:-translate-y-1">
+                    <span className="material-icons mr-2">save</span>
+                    সব পরিবর্তন সেভ করুন
+                </button>
             </div>
         </div>
     );
