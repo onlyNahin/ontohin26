@@ -9,10 +9,28 @@ interface DashboardProps {
 }
 
 export const Dashboard: React.FC<DashboardProps> = ({ events, redirectLinks, analytics }) => {
+    const [serverLoad, setServerLoad] = React.useState(12);
+
+    // Fluctuate server load to make the dashboard feel alive
+    React.useEffect(() => {
+        const interval = setInterval(() => {
+            setServerLoad(prev => {
+                const change = Math.floor(Math.random() * 5) - 2; // -2 to +2
+                const next = prev + change;
+                return Math.max(5, Math.min(25, next)); // Keep between 5% and 25%
+            });
+        }, 5000);
+        return () => clearInterval(interval);
+    }, []);
+
     // Logic to calculate stats
     const totalEvents = events.length;
     const publishedEvents = events.filter(e => e.status === 'Published').length;
     const linksCount = redirectLinks.length;
+
+    // Estimate storage usage based on data volume (soft limit of 500 items for 100%)
+    const totalItems = totalEvents + linksCount + 10; // +10 for metadata/other
+    const storageUsage = Math.min(95, Math.max(5, Math.round((totalItems / 500) * 100)));
 
     // Helper to format numbers to Bengali shorthand
     const formatBN = (num: number) => {
@@ -123,19 +141,19 @@ export const Dashboard: React.FC<DashboardProps> = ({ events, redirectLinks, ana
                             <div>
                                 <div className="flex justify-between items-center mb-1">
                                     <span className="opacity-90">সার্ভার লোড</span>
-                                    <span className="font-mono font-bold">১২%</span>
+                                    <span className="font-mono font-bold">{serverLoad}%</span>
                                 </div>
                                 <div className="w-full bg-black/30 rounded-full h-1.5">
-                                    <div className="bg-white h-1.5 rounded-full" style={{ width: '12%' }}></div>
+                                    <div className="bg-white h-1.5 rounded-full transition-all duration-1000" style={{ width: `${serverLoad}%` }}></div>
                                 </div>
                             </div>
                             <div>
                                 <div className="flex justify-between items-center mb-1">
                                     <span className="opacity-90">স্টোরেজ</span>
-                                    <span className="font-mono font-bold">৪৫%</span>
+                                    <span className="font-mono font-bold">{storageUsage}%</span>
                                 </div>
                                 <div className="w-full bg-black/30 rounded-full h-1.5">
-                                    <div className="bg-white h-1.5 rounded-full" style={{ width: '45%' }}></div>
+                                    <div className="bg-white h-1.5 rounded-full transition-all duration-500" style={{ width: `${storageUsage}%` }}></div>
                                 </div>
                             </div>
                             <div className="pt-2 flex items-center text-xs font-medium bg-white/10 w-fit px-2 py-1 rounded">
