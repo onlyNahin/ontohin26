@@ -18,7 +18,7 @@ import { FooterManager } from './pages/admin/FooterManager';
 import { Settings } from './pages/admin/Settings';
 import { FormBuilder } from './pages/admin/FormBuilder';
 import { AnnouncementManager } from './pages/admin/AnnouncementManager';
-import { INITIAL_EVENTS, GALLERY_ITEMS, INITIAL_ABOUT_DATA, INITIAL_HISTORY_DATA, INITIAL_FOOTER_DATA, INITIAL_HERO_DATA, INITIAL_ANNOUNCEMENTS } from './constants';
+import { INITIAL_ABOUT_DATA, INITIAL_HISTORY_DATA, INITIAL_FOOTER_DATA, INITIAL_HERO_DATA } from './constants';
 import { Event, RedirectLink, GalleryItem, AboutSectionData, HistoryPageData, FooterData, HeroData, RegistrationSubmission, EventRegistration, CustomForm, Announcement, FormSubmission, AnalyticsData } from './types';
 import { Footer } from './components/Footer';
 import { FormInbox } from './pages/admin/FormInbox';
@@ -51,17 +51,17 @@ function App() {
   useEffect(() => {
     const unsubEvents = onSnapshot(query(collection(db, 'events'), orderBy('date', 'desc')), (snapshot) => {
       const data = snapshot.docs.map(doc => ({ ...doc.data(), id: doc.id } as Event));
-      setEvents(snapshot.empty && !isAuthenticated ? INITIAL_EVENTS : data);
+      setEvents(data);
     });
 
     const unsubAnnouncements = onSnapshot(query(collection(db, 'announcements'), orderBy('date', 'desc')), (snapshot) => {
       const data = snapshot.docs.map(doc => ({ ...doc.data(), id: doc.id } as Announcement));
-      setAnnouncements(snapshot.empty && !isAuthenticated ? INITIAL_ANNOUNCEMENTS : data);
+      setAnnouncements(data);
     });
 
     const unsubGallery = onSnapshot(query(collection(db, 'gallery'), orderBy('date', 'desc')), (snapshot) => {
       const data = snapshot.docs.map(doc => ({ ...doc.data(), id: doc.id } as GalleryItem));
-      setGalleryItems(snapshot.empty && !isAuthenticated ? GALLERY_ITEMS : data);
+      setGalleryItems(data);
     });
 
     const unsubAbout = onSnapshot(doc(db, 'metadata', 'about'), (doc) => {

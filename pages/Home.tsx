@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Navbar } from '../components/Navbar';
 import { Footer } from '../components/Footer';
-import { GALLERY_ITEMS, INITIAL_EVENTS, INITIAL_HERO_DATA } from '../constants';
+import { INITIAL_HERO_DATA } from '../constants';
 import { useNavigate } from 'react-router-dom';
 import { AboutSectionData, HistoryPageData, FooterData, HeroData, Event, EventRegistration, GalleryItem } from '../types';
 import { EventRegistrationModal } from '../components/EventRegistrationModal';
@@ -169,39 +169,46 @@ export const Home: React.FC<HomeProps> = ({ darkMode, toggleTheme, aboutData, hi
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {(events || INITIAL_EVENTS).map(event => (
-              <div key={event.id} className="bg-surface-light dark:bg-surface-dark border border-gray-200 dark:border-gray-800 rounded-lg overflow-hidden hover:shadow-xl transition-all duration-300 group flex flex-col">
-                <div className="h-48 overflow-hidden relative">
-                  <img src={event.imageUrl} alt={event.title} className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-500" />
-                  <div className="absolute top-4 right-4 bg-white/90 dark:bg-black/90 backdrop-blur text-center px-3 py-1 rounded">
-                    <div className="text-xs font-bold uppercase text-red-500">
-                      {event.date ? new Date(event.date).toLocaleString('bn-BD', { month: 'short' }) : '---'}
-                    </div>
-                    <div className="text-xl font-bold text-gray-900 dark:text-white">
-                      {event.date ? new Date(event.date).getDate() : '--'}
+            {(events && events.length > 0) ? (
+              events.map(event => (
+                <div key={event.id} className="bg-surface-light dark:bg-surface-dark border border-gray-200 dark:border-gray-800 rounded-lg overflow-hidden hover:shadow-xl transition-all duration-300 group flex flex-col">
+                  <div className="h-48 overflow-hidden relative">
+                    <img src={event.imageUrl} alt={event.title} className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-500" />
+                    <div className="absolute top-4 right-4 bg-white/90 dark:bg-black/90 backdrop-blur text-center px-3 py-1 rounded">
+                      <div className="text-xs font-bold uppercase text-red-500">
+                        {event.date ? new Date(event.date).toLocaleString('bn-BD', { month: 'short' }) : '---'}
+                      </div>
+                      <div className="text-xl font-bold text-gray-900 dark:text-white">
+                        {event.date ? new Date(event.date).getDate() : '--'}
+                      </div>
                     </div>
                   </div>
-                </div>
-                <div className="p-6 flex-1 flex flex-col">
-                  <span className="text-xs font-bold text-primary uppercase mb-2 block">{event.category}</span>
-                  <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2 leading-tight">{event.title}</h3>
-                  <p className="text-gray-500 dark:text-gray-400 text-sm mb-4 line-clamp-2 flex-1">{event.description}</p>
-                  <div className="flex items-center text-gray-400 text-xs mb-4">
-                    <span className="material-icons text-sm mr-1">location_on</span>
-                    {event.location}
-                    <span className="mx-2">•</span>
-                    <span>{event.time}</span>
+                  <div className="p-6 flex-1 flex flex-col">
+                    <span className="text-xs font-bold text-primary uppercase mb-2 block">{event.category}</span>
+                    <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2 leading-tight">{event.title}</h3>
+                    <p className="text-gray-500 dark:text-gray-400 text-sm mb-4 line-clamp-2 flex-1">{event.description}</p>
+                    <div className="flex items-center text-gray-400 text-xs mb-4">
+                      <span className="material-icons text-sm mr-1">location_on</span>
+                      {event.location}
+                      <span className="mx-2">•</span>
+                      <span>{event.time}</span>
+                    </div>
+                    <button
+                      onClick={() => setSelectedEvent(event)}
+                      className="w-full bg-gray-100 dark:bg-gray-800 hover:bg-primary hover:text-white text-gray-900 dark:text-white font-bold py-2 rounded transition-colors text-sm uppercase tracking-wide mt-auto flex items-center justify-center"
+                    >
+                      <span className="material-icons text-sm mr-2">person_add</span>
+                      ইভেন্টে যোগ দিন
+                    </button>
                   </div>
-                  <button
-                    onClick={() => setSelectedEvent(event)}
-                    className="w-full bg-gray-100 dark:bg-gray-800 hover:bg-primary hover:text-white text-gray-900 dark:text-white font-bold py-2 rounded transition-colors text-sm uppercase tracking-wide mt-auto flex items-center justify-center"
-                  >
-                    <span className="material-icons text-sm mr-2">person_add</span>
-                    ইভেন্টে যোগ দিন
-                  </button>
                 </div>
+              ))
+            ) : (
+              <div className="col-span-full text-center py-12 border border-dashed border-gray-200 dark:border-gray-800 rounded-lg">
+                <span className="material-icons text-5xl text-gray-400 dark:text-gray-600 mb-2">event_busy</span>
+                <p className="text-gray-500 dark:text-gray-400 font-medium">বর্তমানে কোনো ইভেন্ট নেই।</p>
               </div>
-            ))}
+            )}
           </div>
           <div className="mt-8 text-center md:hidden">
             <button onClick={scrollToEvents} className="text-primary font-bold">সব ইভেন্ট দেখুন &rarr;</button>
@@ -227,7 +234,15 @@ export const Home: React.FC<HomeProps> = ({ darkMode, toggleTheme, aboutData, hi
                     const dateB = b.date ? new Date(b.date).getTime() : 0;
                     return dateB - dateA;
                   }).slice(0, 4)
-                  : GALLERY_ITEMS.slice(0, 4);
+                  : [];
+
+                if (displayItems.length === 0) {
+                  return (
+                    <div className="col-span-full text-center py-12 border border-dashed border-gray-200 dark:border-gray-800 rounded-lg">
+                      <p className="text-gray-500 dark:text-gray-400 font-medium">এখনও কোনো ছবি নেই।</p>
+                    </div>
+                  );
+                }
 
                 return displayItems.map((item, index) => (
                   <div key={item.id} className={`group relative overflow-hidden rounded-sm cursor-pointer ${index === 0 || index === 3 ? 'md:col-span-2 md:row-span-2 min-h-[300px]' : 'min-h-[200px]'}`} onClick={() => navigate('/gallery')}>
